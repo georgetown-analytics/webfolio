@@ -1,5 +1,6 @@
 ## Web Application
 Django==3.0.1
+django-model-utils>=4.0.0
 dj-database-url>=0.5.0
 psycopg2>=2.7,<2.8 --no-binary psycopg2
 python-dotenv>=0.10.3
