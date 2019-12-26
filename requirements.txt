@@ -1,0 +1,48 @@
+## Web Application
+Django==3.0.1
+dj-database-url>=0.5.0
+psycopg2>=2.7,<2.8 --no-binary psycopg2
+python-dotenv>=0.10.3
+whitenoise>=4.1.2
+
+## Utilities
+pytz>=2019.1
+python-dateutil>=2.8.0
+six>=1.13.0
+
+## Subdependencies
+# asgiref==3.2.3
+# sqlparse==0.3.0
+
+## Test Dependencies
+## Uncomment these for development
+# factory-boy==2.12.0
+# pytest==4.6.3
+# pytest-cov==2.7.1
+# pytest-django==3.5.0
+# pytest-env==0.6.2
+# pytest-flakes==4.0.0
+
+## Test Subdependencies
+
+## Editing Dependencies (uncomment for VSCode)
+# black==19.10b0
+# flake8==3.7.9
+
+## Editing Subdependencies
+# appdirs==1.4.3
+# attrs==19.3.0
+# Click==7.0
+# entrypoints==0.3
+# mccabe==0.6.1
+# pathspec==0.6.0
+# pycodestyle==2.5.0
+# pyflakes==2.1.1
+# regex==2019.12.20
+# toml==0.10.0
+# typed-ast==1.4.0
+
+## Python Environment
+# pip==19.3.1
+# setuptools==42.0.2
+# wheel==0.33.6
