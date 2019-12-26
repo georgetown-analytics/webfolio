@@ -5,6 +5,14 @@
 <main role="main" class="container">
   {% block content %}
   <h1 class="mt-5">TODO: Add Content</h1>
+  {% if user.is_authenticated %}
+  <p>Logged In</p>
+  {% else %}
+  <a href="{% url 'social:begin' 'google-oauth2' %}" class="btn btn-lg btn-primary btn-block">
+    <i class="fa fa-google-plus-square"></i>
+    Sign in with Google
+  </a>
+  {% endif %}
   {% endblock %}
 </main>
 
