@@ -1,0 +1,12 @@
+/* TEAM */
+
+    Developer: Benjamin Bengfort
+    Twitter: @bbengfort
+    From: Washington, DC
+
+/* SITE */
+
+    Last update: 2020/01/07
+    Language: English
+    Doctype: HTML5
+    IDE: VSCode Editor
