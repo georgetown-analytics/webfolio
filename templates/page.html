@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<!-- Begin page content -->
+<main role="main" class="container">
+  {% block content %}
+  <h1 class="mt-5">TODO: Add Content</h1>
+  {% endblock %}
+</main>
+
+{% block footer %}
+{% include 'components/footer.html' %}
+{% endblock %}
+
+{% block modals %}
+{{ block.super }}
+{% endblock %}
+{% endblock %}

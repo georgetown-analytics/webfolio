@@ -29,9 +29,29 @@ Including another URLconf
 ## Imports
 ##########################################################################
 
-from django.contrib import admin
 from django.urls import path
+from django.contrib import admin
+
+from django.views.generic import TemplateView
+
+
+##########################################################################
+## URL Patterns
+##########################################################################
 
 urlpatterns = [
+    # Admin URLs
     path('admin/', admin.site.urls),
+
+     # Application URLs
+    path('', TemplateView.as_view(template_name="page.html"), name="home"),
 ]
+
+##########################################################################
+## Error handling
+##########################################################################
+
+# handler400 = 'webfolio.views.bad_request'
+# handler403 = 'webfolio.views.permission_denied'
+# handler404 = 'webfolio.views.not_found'
+# handler500 = 'webfolio.views.server_error'
