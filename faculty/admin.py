@@ -1,8 +1,8 @@
-# cohort.admin
-# Cohort app admin site.
+# faculty.admin
+# Faculty app admin site management.
 #
 # Author:   Benjamin Bengfort <benjamin@bengfort.com>
-# Created:  Thu Dec 26 15:06:39 2019 -0600
+# Created:  Thu Dec 26 16:06:48 2019 -0600
 #
 # Copyright (C) 2019 Georgetown University
 # For license information, see LICENSE.txt
@@ -10,7 +10,7 @@
 # ID: admin.py [] benjamin@bengfort.com $
 
 """
-Cohort app admin site.
+Faculty app admin site management.
 """
 
 ##########################################################################
@@ -18,12 +18,13 @@ Cohort app admin site.
 ##########################################################################
 
 from django.contrib import admin
-from .models import Cohort, Course
+from .models import Faculty, Instructor, Advisor
 
 
 ##########################################################################
 ## Register your models here
 ##########################################################################
 
-admin.site.register(Cohort)
-admin.site.register(Course)
+admin.site.register(Faculty)
+admin.site.register(Instructor)
+admin.site.register(Advisor)

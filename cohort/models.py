@@ -56,6 +56,24 @@ class Cohort(TimeStampedModel):
         help_text="Date that the cohort ends, e.g. the last day of Applied",
     )
 
+    def faculty(self):
+        """
+        Yields all faculty members associated with the cohort.
+        """
+        for fa in self.faculty_assignments():
+            yield fa.faculty
+
+    def faculty_assignments(self):
+        """
+        Yields all faculty assignments, starting with advisors then instructors.
+        """
+        for advisor in self.advisors.all():
+            yield advisor
+
+        for course in self.courses.all(select_related=True):
+            for instructor in course.instructors.all():
+                yield instructor
+
     def get_semester_display(self):
         year = self.start.strftime("%Y")
         return "{} {}".format(SEMESTER[self.semester].title(), year)
@@ -104,6 +122,9 @@ class Course(TimeStampedModel):
         null=True, blank=True,
         help_text="Date that the course ends, e.g. the last day of the course",
     )
+    instructors = models.ManyToManyField(
+        "faculty.Faculty", through="faculty.Instructor", related_name="courses",
+    )
 
     class Meta:
         db_table = "courses"
@@ -129,3 +150,7 @@ class Capstone(TimeStampedModel):
         max_length=255, null=False, blank=False,
         help_text="The full title of the capstone project",
     )
+
+    class Meta:
+        db_table = "capstones"
+        ordering = ("-cohort",)

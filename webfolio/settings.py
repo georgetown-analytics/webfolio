@@ -109,6 +109,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'social_django',
     'cohort',
+    'faculty',
 ]
 
 # Request handling
