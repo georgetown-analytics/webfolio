@@ -48,13 +48,17 @@ class Cohort(TimeStampedModel):
         help_text="The academic semester the cohort has been assigned to",
     )
     start = models.DateField(
-        null=False, blank=False,
+        null=True, blank=True,
         help_text="Date that the cohort starts, e.g. the first day of Foundations",
     )
     end = models.DateField(
-        null=False, blank=False,
+        null=True, blank=True,
         help_text="Date that the cohort ends, e.g. the last day of Applied",
     )
+
+    class Meta:
+        db_table = "cohorts"
+        ordering = ("-cohort",)
 
     def faculty(self):
         """
@@ -75,12 +79,16 @@ class Cohort(TimeStampedModel):
                 yield instructor
 
     def get_semester_display(self):
+        if not self.start:
+            return SEMESTER[self.semester].title()
+
         year = self.start.strftime("%Y")
         return "{} {}".format(SEMESTER[self.semester].title(), year)
 
-    class Meta:
-        db_table = "cohorts"
-        ordering = ("-cohort",)
+    def __str__(self):
+        if self.start:
+            return "Cohort {} ({})".format(self.cohort, self.get_semester_display())
+        return "Cohort {}".format(self.cohort)
 
 
 ##########################################################################
@@ -111,7 +119,7 @@ class Course(TimeStampedModel):
         help_text="The full title of the course in the semester it's offered",
     )
     hours = models.PositiveSmallIntegerField(
-        null=False, blank=False, default=12,
+        null=True, blank=True, default=12,
         help_text="The number of hours in the course, e.g. the CEUs",
     )
     start = models.DateField(
@@ -128,8 +136,11 @@ class Course(TimeStampedModel):
 
     class Meta:
         db_table = "courses"
-        ordering = ("-start",)
+        ordering = ("-cohort__cohort", "start")
         unique_together = ("course_id", "section")
+
+    def __str__(self):
+        return "{} -- {}".format(self.title, self.cohort)
 
 
 ##########################################################################
@@ -154,3 +165,6 @@ class Capstone(TimeStampedModel):
     class Meta:
         db_table = "capstones"
         ordering = ("-cohort",)
+
+    def __str__(self):
+        return "{} ({})".format(self.title, self.cohort)

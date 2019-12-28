@@ -32,6 +32,15 @@ FACULTY_ROLES = Choices(
     ("SE", "SME", "Subject Matter Expert"),
 )
 
+NAME_PREFIX = Choices(
+    "Dr.", "Mr.", "Ms.", "Mrs.", "Dean", "Hon.", "Rev.",
+)
+
+NAME_SUFFIX = Choices(
+    "PhD", "Esq", "MD", "LLD", "JD", "RN", "DO", "DDS", "CPA",
+    "Jr.", "Sr.", "II", "III", "IV"
+)
+
 
 ##########################################################################
 ## Faculty Model
@@ -51,6 +60,10 @@ class Faculty(TimeStampedModel):
         max_length=24, null=True, blank=True,
         help_text="The Georgetown NetID of the faculty member",
     )
+    prefix = models.CharField(
+        max_length=4, null=True, blank=True, choices=NAME_PREFIX, default=None,
+        help_text="Title or prefix for the faculty member's display name",
+    )
     first_name = models.CharField(
         max_length=255, null=True, blank=True,
         help_text="The first name of the faculty, if not set the user is used",
@@ -58,6 +71,10 @@ class Faculty(TimeStampedModel):
     last_name = models.CharField(
         max_length=255, null=True, blank=True,
         help_text="The last name of the faculty, if not set the user is used",
+    )
+    suffix = models.CharField(
+        max_length=4, null=True, blank=True, choices=NAME_SUFFIX, default=None,
+        help_text="Suffix for the faculty member's display name",
     )
     hourly_rate = models.DecimalField(
         max_digits=10, decimal_places=2, blank=True, null=True, default=0.0,
@@ -73,8 +90,16 @@ class Faculty(TimeStampedModel):
     def get_full_name(self):
         fn = " ".join([self.first_name, self.last_name]).strip()
         if not fn and self.user is not None:
-            return self.user.get_full_name()
+            fn = self.user.get_full_name()
+
+        if self.prefix:
+            fn = "{} {}".format(self.prefix, fn)
+        if self.suffix:
+            fn += ", " + self.suffix
         return fn
+
+    def __str__(self):
+        return self.get_full_name()
 
 
 ##########################################################################
@@ -99,7 +124,7 @@ class Instructor(TimeStampedModel):
         help_text="The faculty member that is instructing the course",
     )
     effort = models.PositiveSmallIntegerField(
-        null=False, blank=True, default=100,
+        null=True, blank=True, default=100,
         validators=[MinValueValidator(1), MaxValueValidator(100)],
         help_text="Percent of effort/responsibility the instructor is assigned",
     )
@@ -116,6 +141,12 @@ class Instructor(TimeStampedModel):
         db_table = "instructors"
         ordering = ("-course__start",)
         unique_together = ("course", "faculty")
+        verbose_name = "Instructional assignment"
+
+    def __str__(self):
+        if self.effort and self.effort != 100:
+            return "{} teaching {} ({}%)".format(self.faculty, self.course, self.effort)
+        return "{} teaching {}".format(self.faculty, self.course)
 
 
 class Advisor(TimeStampedModel):
@@ -137,11 +168,11 @@ class Advisor(TimeStampedModel):
         help_text="The role of the faculty member in the cohort",
     )
     hours = models.PositiveSmallIntegerField(
-        null=False, blank=True, default=30,
+        null=True, blank=True,
         help_text="The number of instructional hours assigned to the advisor",
     )
     effort = models.PositiveSmallIntegerField(
-        null=False, blank=True, default=100,
+        null=True, blank=True, default=100,
         validators=[MinValueValidator(1), MaxValueValidator(100)],
         help_text="Percent of effort/responsibility the advisor is assigned",
     )
@@ -154,3 +185,9 @@ class Advisor(TimeStampedModel):
         db_table = "advisors"
         ordering = ("-cohort__start",)
         unique_together = ("cohort", "faculty", "role")
+        verbose_name = "Advising assignment"
+
+    def __str__(self):
+        if self.effort and self.effort != 100:
+            return "{} Cohort {} {} ({}%)".format(self.faculty, self.cohort.cohort, self.get_role_display(), self.effort)
+        return "{} Cohort {} {}".format(self.faculty, self.cohort.cohort, self.get_role_display())
