@@ -92,7 +92,7 @@ SECRET_KEY = environ_setting("SECRET_KEY")
 DEBUG = parse_bool(environ_setting("WEBFOLIO_DEBUG", True))
 
 # Specify hosts in production settings
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 INTERNAL_IPS = ["127.0.0.1"]
 
 # WSGI and ASGI configuration
@@ -146,7 +146,7 @@ STATICFILES_DIRS = (
 )
 
 ## Static files served by WhiteNoise nostatic server
-STATIC_ROOT = os.path.join(PROJECT, 'tmp', 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'tmp', 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 TEMPLATES = [

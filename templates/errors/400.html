@@ -1,4 +1,5 @@
 {% extends 'errors/base.html' %}
 
-{% block error_title %}A Server 400 Error occurred!{% endblock %}
-{% block error_description %}We couldn't figure out your request.{% endblock %}
+{%block error_code %}<div class="error mx-auto" data-text="400">400</div>{% endblock %}
+{% block error_title %}Bad Request!{% endblock %}
+{% block error_description %}We couldn't figure out your request &hellip;{% endblock %}

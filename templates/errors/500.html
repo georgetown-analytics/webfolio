@@ -1,4 +1,5 @@
 {% extends 'errors/base.html' %}
 
-{% block error_title %}A Server 500 Error occurred!{% endblock %}
-{% block error_description %}Something very bad happened.{% endblock %}
+{%block error_code %}<div class="error mx-auto" data-text="500">500</div>{% endblock %}
+{% block error_title %}Unhandled Error!{% endblock %}
+{% block error_description %}Something very bad happened (admins have been notified).{% endblock %}
