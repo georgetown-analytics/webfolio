@@ -52,15 +52,15 @@ class Cohort(TimeStampedModel):
         help_text="The academic semester the cohort has been assigned to",
     )
     section = models.CharField(
-        max_length=1, null=False, blank=False, choices=SECTION,
+        max_length=1, null=True, blank=True, choices=SECTION, default=None,
         help_text="If multiple cohorts per semester, the semester section",
     )
     start = models.DateField(
-        null=True, blank=True,
+        null=True, blank=True, default=None,
         help_text="Date that the cohort starts, e.g. the first day of Foundations",
     )
     end = models.DateField(
-        null=True, blank=True,
+        null=True, blank=True, default=None,
         help_text="Date that the cohort ends, e.g. the last day of Applied",
     )
 
@@ -97,7 +97,7 @@ class Cohort(TimeStampedModel):
         if self.start:
             year = self.start.strftime("%Y")
 
-        sem = "{} {} {}".format(SEMESTER[self.semester].title(), year, self.section)
+        sem = "{} {} {}".format(SEMESTER[self.semester].title(), year, self.section or "")
         return sem.strip().replace("  ", " ")
 
     def percent_complete(self):
