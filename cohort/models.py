@@ -17,9 +17,11 @@ Cohort app database models.
 ## Imports
 ##########################################################################
 
+from datetime import date
 from django.db import models
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
+from cohort.managers import CohortManager, CourseManager
 
 
 SEMESTER = Choices(
@@ -27,6 +29,8 @@ SEMESTER = Choices(
     ("SU", "Summer", "Summer"),
     ("FA", "Fall", "Fall"),
 )
+
+SECTION = Choices("A", "B", "C")
 
 
 ##########################################################################
@@ -47,6 +51,10 @@ class Cohort(TimeStampedModel):
         max_length=2, choices=SEMESTER, null=False, blank=False,
         help_text="The academic semester the cohort has been assigned to",
     )
+    section = models.CharField(
+        max_length=1, null=False, blank=False, choices=SECTION,
+        help_text="If multiple cohorts per semester, the semester section",
+    )
     start = models.DateField(
         null=True, blank=True,
         help_text="Date that the cohort starts, e.g. the first day of Foundations",
@@ -55,6 +63,9 @@ class Cohort(TimeStampedModel):
         null=True, blank=True,
         help_text="Date that the cohort ends, e.g. the last day of Applied",
     )
+
+    # Add a custom manager to easily select cohorts by time
+    objects = CohortManager()
 
     class Meta:
         db_table = "cohorts"
@@ -79,11 +90,27 @@ class Cohort(TimeStampedModel):
                 yield instructor
 
     def get_semester_display(self):
-        if not self.start:
-            return SEMESTER[self.semester].title()
+        """
+        Effective string representation of the Semester
+        """
+        year = ""
+        if self.start:
+            year = self.start.strftime("%Y")
 
-        year = self.start.strftime("%Y")
-        return "{} {}".format(SEMESTER[self.semester].title(), year)
+        sem = "{} {} {}".format(SEMESTER[self.semester].title(), year, self.section)
+        return sem.strip().replace("  ", " ")
+
+    def percent_complete(self):
+        """
+        The percent of the days in the cohort that have been completed.
+        """
+        tdays = (self.end - self.start).days
+        cdays = (date.today() - self.start).days
+        if cdays < 0:
+            return 0
+        if cdays >= tdays:
+            return 100
+        return int((cdays/tdays) * 100)
 
     def __str__(self):
         if self.start:
@@ -133,6 +160,9 @@ class Course(TimeStampedModel):
     instructors = models.ManyToManyField(
         "faculty.Faculty", through="faculty.Instructor", related_name="courses",
     )
+
+    # Add a custom manager to easily select courses by time
+    objects = CourseManager()
 
     class Meta:
         db_table = "courses"

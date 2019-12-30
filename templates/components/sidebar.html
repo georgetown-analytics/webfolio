@@ -14,10 +14,10 @@
   <hr class="sidebar-divider my-0">
 
   <!-- Nav Item - Dashboard -->
-  <li class="nav-item active">
-    <a class="nav-link" href="#">
+  <li class="nav-item{% if page == 'overview' %} active{% endif %}">
+    <a class="nav-link" href="{% url 'overview' %}">
       <i class="fa fa-fw fa-chalkboard"></i>
-      <span>Dashboard</span></a>
+      <span>Overview</span></a>
   </li>
 
   <!-- Divider -->
@@ -54,8 +54,9 @@
     </a>
     <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
       <div class="bg-white py-2 collapse-inner rounded">
-        <h6 class="collapse-header">Faculty Admin:</h6>
+        <h6 class="collapse-header">Directory:</h6>
         <a class="collapse-item" href="#">Faculty</a>
+        <h6 class="collapse-header">Assignments:</h6>
         <a class="collapse-item" href="#">Advisors</a>
         <a class="collapse-item" href="#">Instructors</a>
       </div>

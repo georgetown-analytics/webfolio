@@ -30,9 +30,19 @@ Including another URLconf
 ##########################################################################
 
 from django.contrib import admin
+from rest_framework import routers
 from django.urls import path, include
 
-from django.views.generic import TemplateView
+from webfolio.views import HeartbeatViewSet, Overview
+
+
+##########################################################################
+## Endpoint Discovery
+##########################################################################
+
+# Top level router
+router = routers.DefaultRouter()
+router.register(r'status', HeartbeatViewSet, "status")
 
 
 ##########################################################################
@@ -48,7 +58,10 @@ urlpatterns = [
     path("", include(("social_django.urls", "social_django"), namespace="social")),
 
     # Application URLs
-    path("", TemplateView.as_view(template_name="page.html"), name="home"),
+    path("", Overview.as_view(), name="overview"),
+
+    ## REST API Urls
+    path('api/', include((router.urls, 'rest_framework'), namespace="api")),
 ]
 
 ##########################################################################

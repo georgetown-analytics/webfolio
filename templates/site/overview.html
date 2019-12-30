@@ -1,0 +1,175 @@
+{% extends "page.html" %}
+{% load static %}
+
+{% block page_title %}Overview{% endblock %}
+
+{% block page_body %}
+<!-- At-A-Glance Info Cards -->
+<div class="row" id="at-a-glance-info">
+
+  <!-- Next Capstone Presentations -->
+  <div class="col-xl-3 col-md-6 mb-4">
+    <div class="card border-left-primary shadow h-100 py-2">
+      <div class="card-body">
+        <div class="row no-gutters align-items-center">
+          <div class="col mr-2">
+            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Capstone Presentations</div>
+            <div class="h5 mb-0 font-weight-bold text-gray-800">{% if next_capstone_presentations %}{{ next_capstone_presentations }}{% else %}Unscheduled{% endif %}</div>
+          </div>
+          <div class="col-auto">
+            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Numbe of Active Courses -->
+  <div class="col-xl-3 col-md-6 mb-4">
+    <div class="card border-left-success shadow h-100 py-2">
+      <div class="card-body">
+        <div class="row no-gutters align-items-center">
+          <div class="col mr-2">
+            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Active Courses</div>
+            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ num_active_courses }}</div>
+          </div>
+          <div class="col-auto">
+            <i class="fas fa-chalkboard-teacher fa-2x text-gray-300"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cohort Progress -->
+  <div class="col-xl-3 col-md-6 mb-4">
+    <div class="card border-left-info shadow h-100 py-2">
+      <div class="card-body">
+        <div class="row no-gutters align-items-center">
+          <div class="col mr-2">
+            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Cohort {% if cohort_progress %}{{ cohort_progress.cohort }} {% endif %}Progress</div>
+            {% if cohort_progress %}
+            <div class="row no-gutters align-items-center">
+              <div class="col-auto">
+                <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ cohort_progress.pcent }}%</div>
+              </div>
+              <div class="col">
+                <div class="progress progress-sm mr-2">
+                  <div class="progress-bar bg-info" role="progressbar" style="width: {{ cohort_progress.pcent }}%" aria-valuenow="{{ cohort_progress.pcent }}"
+                    aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+              </div>
+            </div>
+            {% else %}
+            <div class="h5 mb-0 font-weight-bold text-gray-800">No active cohorts</div>
+            {% endif %}
+          </div>
+          <div class="col-auto">
+            <i class="fas fa-stopwatch fa-2x text-gray-300"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scheduled Upcoming Courses -->
+  <div class="col-xl-3 col-md-6 mb-4">
+    <div class="card border-left-warning shadow h-100 py-2">
+      <div class="card-body">
+        <div class="row no-gutters align-items-center">
+          <div class="col mr-2">
+            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Scheduled Courses</div>
+            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ num_upcomming_courses }}</div>
+          </div>
+          <div class="col-auto">
+            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- At-A-Glance Info Cards Ends -->
+
+<!-- Cohort Schedules -->
+<div class="row" id="cohort-schedules">
+  <div class="col-12">
+    <div class="card shadow mb-4">
+      <!-- Card Header - Dropdown -->
+      <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">Course Schedule</h6>
+        <div class="dropdown no-arrow">
+          <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+          </a>
+          <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+            <div class="dropdown-header">No Panel Actions Available</div>
+          </div>
+        </div>
+      </div>
+      <!-- Card Body -->
+      <div class="card-body">
+        {% if current_cohorts %}
+        <ul class="nav nav-tabs" role="tablist">
+        {% for cohort in current_cohorts %}
+          <li class="nav-item" >
+            <a class="nav-link{% if forloop.counter == 1 %} active{% endif %}"
+              href="#cohortSchedule{{ cohort.cohort }}" data-toggle="tab" role="tab">
+              {{ cohort.get_semester_display }}
+            </a>
+          </li>
+        {% endfor %}
+        </ul>
+        <div class="tab-content">
+        {% for cohort in current_cohorts %}
+          <div class="tab-pane fade{% if forloop.counter == 1 %} show active{% endif %}" id="cohortSchedule{{ cohort.cohort }}" role="tabpanel">
+            <div class="my-4 px-2">
+              <h4 class="small font-weight-bold">Cohort {{ cohort.cohort }} Progress <span class="float-right">{{ cohort.percent_complete }}%</span></h4>
+              <div class="progress">
+                <div class="progress-bar bg-success" role="progressbar"
+                  style="width: {{ cohort.percent_complete }}%"
+                  aria-valuenow="{{ cohort.percent_complete }}" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-bordred table-striped table-sm table-hover" width="100%" cellspacing="0">
+                <thead>
+                  <tr>
+                    <th>Course</th>
+                    <th>Instructor(s)</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for course in cohort.courses.all %}
+                  <tr>
+                    <td>{{ course.title }}</td>
+                    <td>{{ course.instructors.all|join:"<br />" }}</td>
+                    <td>{{ course.start }}</td>
+                    <td>{{ course.end }}</td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                    <td colspan="4">No courses have been added to the cohort.</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center">
+          <img class="img-fluid px-3 px-sm-4 mt-3 mb-4" style="width: 25rem;" src="{% static 'img/undraw/events_2p66.svg' %}" alt="Empty Calendar" />
+          <p class="lead">No upcoming cohorts have been scheduled.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div><!-- Cohort Schedules Ends -->
+
+{% endblock %}
