@@ -23,7 +23,7 @@ import sys
 import dotenv
 
 
-DJANGO_SETTINGS_MODULE = "webfolio.settings"
+DJANGO_SETTINGS_MODULE = "webfolio.settings.development"
 
 
 ##########################################################################

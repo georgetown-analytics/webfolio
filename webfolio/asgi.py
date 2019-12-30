@@ -36,7 +36,7 @@ from django.core.asgi import get_asgi_application
 dotenv.load_dotenv(dotenv.find_dotenv())
 
 # set default environment variables
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "webfolio.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "webfolio.settings.development")
 
 # export the asgi application for import
 application = get_asgi_application()
