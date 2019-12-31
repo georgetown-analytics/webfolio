@@ -17,6 +17,44 @@ Cohort app views.
 ## Imports
 ##########################################################################
 
-from django.shortcuts import render
+from django.views.generic import ListView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
-# Create your views here.
+from cohort.models import Cohort, Course, Capstone
+
+
+class CohortListView(ListView, LoginRequiredMixin):
+
+    model = Cohort
+    context_object_name = "cohorts"
+
+    def get_context_data(self, **kwargs):
+        context = super(CohortListView, self).get_context_data(**kwargs)
+        context["page"] = "cohort/cohorts"
+        return context
+
+
+class CourseListView(ListView, LoginRequiredMixin):
+
+    model = Course
+    context_object_name = "courses"
+
+    def get_queryset(self):
+        qs = super(CourseListView, self).get_queryset()
+        return qs.order_by("-cohort__cohort", "-end")
+
+    def get_context_data(self, **kwargs):
+        context = super(CourseListView, self).get_context_data(**kwargs)
+        context["page"] = "cohort/courses"
+        return context
+
+
+class CapstoneListView(ListView, LoginRequiredMixin):
+
+    model = Capstone
+    context_object_name = "capstones"
+
+    def get_context_data(self, **kwargs):
+        context = super(CapstoneListView, self).get_context_data(**kwargs)
+        context["page"] = "cohort/capstones"
+        return context

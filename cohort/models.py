@@ -82,6 +82,7 @@ class Cohort(TimeStampedModel):
         """
         Yields all faculty assignments, starting with advisors then instructors.
         """
+        # TODO: change to assignments query
         for advisor in self.advisors.all():
             yield advisor
 

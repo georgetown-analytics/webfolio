@@ -20,5 +20,13 @@ Faculty apps and configuration.
 from django.apps import AppConfig
 
 
+##########################################################################
+## AppConfig
+##########################################################################
+
 class FacultyConfig(AppConfig):
+
     name = 'faculty'
+
+    def ready(self):
+        import faculty.signals # noqa

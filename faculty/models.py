@@ -19,9 +19,13 @@ Faculty app database models.
 
 from django.db import models
 from model_utils import Choices
+from collections import Counter
 from django.conf import settings
+from faculty.managers import AssignmentManager
 from model_utils.models import TimeStampedModel
+from django.contrib.contenttypes.models import ContentType
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 
 
 FACULTY_ROLES = Choices(
@@ -98,6 +102,14 @@ class Faculty(TimeStampedModel):
             fn += ", " + self.suffix
         return fn
 
+    def primary_role(self):
+        """
+        Returns the most common assignment this faculty member has had.
+        """
+        # TODO: this hack is going to lead to poor performance
+        roles = Counter(Assignment.objects.faculty(self).roles())
+        return FACULTY_ROLES[roles.most_common(1)[0][0]]
+
     def __str__(self):
         return self.get_full_name()
 
@@ -105,6 +117,35 @@ class Faculty(TimeStampedModel):
 ##########################################################################
 ## Faculty Assignments
 ##########################################################################
+
+class Assignment(TimeStampedModel):
+    """
+    Assignments join both instructional and advisorial assignments and relate them to a
+    single paid contract. This table uses ContentTypes to join the different assignment
+    types into a single queryable model.
+    """
+
+    content_type = models.ForeignKey(
+        ContentType, on_delete=models.CASCADE, null=False, blank=False,
+        help_text="The model type of the assignment object, e.g. Instructor or Assignment",
+    )
+    object_id = models.PositiveSmallIntegerField(
+        null=False, blank=False,
+        help_text="The primary key of the assignment object."
+    )
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    # Use a custom manager for better queries
+    objects = AssignmentManager()
+
+    class Meta:
+        db_table = "assignments"
+        ordering = ("-created",)
+        unique_together = ("content_type", "object_id")
+
+    def __str__(self):
+        return str(self.content_object)
+
 
 class Instructor(TimeStampedModel):
     """
@@ -136,6 +177,7 @@ class Instructor(TimeStampedModel):
         max_length=2, choices=FACULTY_ROLES, default=FACULTY_ROLES.Instructor,
         null=False, blank=True, help_text="The role of the faculty member in the cohort",
     )
+    assignment = GenericRelation(Assignment, related_query_name="instructor")
 
     class Meta:
         db_table = "instructors"
@@ -161,6 +203,7 @@ class Advisor(TimeStampedModel):
     )
     faculty = models.ForeignKey(
         "Faculty", on_delete=models.CASCADE, null=False, blank=False,
+        related_name="advisor_assignments",
         help_text="The faculty member that is advising the cohort",
     )
     role = models.CharField(
@@ -180,6 +223,7 @@ class Advisor(TimeStampedModel):
         default=True, null=False,
         help_text="If this advisor has primary responsibility for the cohort"
     )
+    assignment = GenericRelation(Assignment, related_query_name="advisor")
 
     class Meta:
         db_table = "advisors"

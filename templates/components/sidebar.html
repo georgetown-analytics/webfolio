@@ -1,4 +1,6 @@
 {% load static %}
+{% load utils %}
+
 <!-- Sidebar -->
 <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
@@ -29,7 +31,7 @@
   </div>
 
   <!-- Nav Item - Cohort Collapse Menu -->
-  <li class="nav-item">
+  <li class="nav-item{% if page|startswith:'cohort' %} active{% endif %}">
     <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true"
       aria-controls="collapseTwo">
       <i class="fas fa-fw fa-school"></i>
@@ -38,15 +40,15 @@
     <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
       <div class="bg-white py-2 collapse-inner rounded">
         <h6 class="collapse-header">Cohort Admin:</h6>
-        <a class="collapse-item" href="#">Cohorts</a>
-        <a class="collapse-item" href="#">Courses</a>
-        <a class="collapse-item" href="#">Capstones</a>
+        <a class="collapse-item" href="{% url 'cohort_list' %}">Cohorts</a>
+        <a class="collapse-item" href="{% url 'course_list' %}">Courses</a>
+        <a class="collapse-item" href="{% url 'capstone_list' %}">Capstones</a>
       </div>
     </div>
   </li>
 
   <!-- Nav Item - Faculty Collapse Menu -->
-  <li class="nav-item">
+  <li class="nav-item{% if page|startswith:'faculty' %} active{% endif %}">
     <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities" aria-expanded="true"
       aria-controls="collapseUtilities">
       <i class="fas fa-fw fa-user-graduate"></i>
@@ -54,11 +56,9 @@
     </a>
     <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
       <div class="bg-white py-2 collapse-inner rounded">
-        <h6 class="collapse-header">Directory:</h6>
-        <a class="collapse-item" href="#">Faculty</a>
-        <h6 class="collapse-header">Assignments:</h6>
-        <a class="collapse-item" href="#">Advisors</a>
-        <a class="collapse-item" href="#">Instructors</a>
+        <h6 class="collapse-header">Faculty Admin:</h6>
+        <a class="collapse-item" href="{% url 'faculty_list' %}">Faculty</a>
+        <a class="collapse-item" href="{% url 'assignment_list' %}">Assignments</a>
       </div>
     </div>
   </li>

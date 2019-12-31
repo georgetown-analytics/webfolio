@@ -14,5 +14,7 @@ Defines faculty and their course assignments.
 """
 
 ##########################################################################
-## Imports
+## Configuration
 ##########################################################################
+
+default_app_config = 'faculty.apps.FacultyConfig'

@@ -17,6 +17,30 @@ Faculty app views.
 ## Imports
 ##########################################################################
 
-from django.shortcuts import render
+from django.views.generic import ListView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
-# Create your views here.
+from faculty.models import Faculty, Assignment
+
+
+class FacultyListView(ListView, LoginRequiredMixin):
+
+    model = Faculty
+    context_object_name = "faculty"
+
+    def get_context_data(self, **kwargs):
+        context = super(FacultyListView, self).get_context_data(**kwargs)
+        context["page"] = "faculty/faculty"
+        return context
+
+
+class AssignmentListView(ListView, LoginRequiredMixin):
+
+    model = Assignment
+    template_name = "faculty/assignments_list.html"
+    context_object_name = "assignments"
+
+    def get_context_data(self, **kwargs):
+        context = super(AssignmentListView, self).get_context_data(**kwargs)
+        context["page"] = "faculty/assignments"
+        return context

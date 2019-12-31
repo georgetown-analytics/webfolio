@@ -1,0 +1,74 @@
+{% extends "page.html" %}
+{% load static %}
+
+{% block stylesheets %}
+{{ block.super }}
+<link href="{% static 'vendor/datatables/dataTables.bootstrap4.min.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block page_title %}Cohorts{% endblock %}
+{% block page_heading_extra %}{% endblock %}
+
+{% block page_body %}
+{% if cohorts %}
+<!-- Courses Data Table-->
+<div class="card shadow mb-4">
+  <div class="card-header py-3">
+    <h6 class="m-0 font-weight-bold text-primary">All Cohorts</h6>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped table-hover" id="dataTable" width="100%" cellspacing="0">
+        <thead>
+          <tr>
+            <th>Cohort</th>
+            <th>Semester</th>
+            <th>Progress</th>
+            <th>Start</th>
+            <th>End</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cohort in cohorts %}
+          <tr>
+            <td>{{ cohort.cohort }}</td>
+            <td>{{ cohort.get_semester_display }}</td>
+            <td>{% with pcent=cohort.percent_complete %}
+            {% if pcent == 0 %} <span class="text-danger">Not started</span>
+            {% elif pcent == 100 %} Completed
+            {% else %} <span class="text-success">In Progress - {{ pcent }}%</span>
+            {% endif %}
+            {% endwith %}</td>
+            <td>{% if cohort.start %}{{ cohort.start|date:"Y-m-d" }}{% endif %}</td>
+            <td>{% if cohort.end %}{{ cohort.end|date:"Y-m-d" }}{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div><!-- Courses Data Table card ends-->
+{% else %}
+{# No courses match the specified query #}
+<div class="text-center">
+  <img class="img-fluid px-3 px-sm-4 mt-3 mb-4" style="width: 50rem;"
+    src="{% static 'img/undraw/alien_science_nonm.svg' %}" alt="No Courses" />
+  <p class="lead">The admissions committee is taking their time reviewing (no cohorts found)!</p>
+</div>
+{% endif %}
+{% endblock %}
+
+
+{% block javascripts %}
+{{ block.super }}
+<script src="{% static 'vendor/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
+<script type="text/javascript">
+  // Call the dataTables jQuery plugin
+  $(document).ready(function () {
+    $('#dataTable').DataTable({
+      "order": [[0, "desc"]]
+    });
+  });
+</script>
+{% endblock %}

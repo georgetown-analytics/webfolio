@@ -34,6 +34,8 @@ from rest_framework import routers
 from django.urls import path, include
 
 from webfolio.views import HeartbeatViewSet, Overview
+from cohort.views import CohortListView, CourseListView, CapstoneListView
+from faculty.views import FacultyListView, AssignmentListView
 
 
 ##########################################################################
@@ -59,6 +61,11 @@ urlpatterns = [
 
     # Application URLs
     path("", Overview.as_view(), name="overview"),
+    path("cohorts/", CohortListView.as_view(), name="cohort_list"),
+    path("courses/", CourseListView.as_view(), name="course_list"),
+    path("capstones/", CapstoneListView.as_view(), name="capstone_list"),
+    path("faculty/", FacultyListView.as_view(), name="faculty_list"),
+    path("faculty/assignments/", AssignmentListView.as_view(), name="assignment_list"),
 
     ## REST API Urls
     path('api/', include((router.urls, 'rest_framework'), namespace="api")),
