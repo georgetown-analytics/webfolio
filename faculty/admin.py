@@ -18,7 +18,7 @@ Faculty app admin site management.
 ##########################################################################
 
 from django.contrib import admin
-from .models import Faculty, Instructor, Advisor
+from .models import Faculty, Assignment
 
 
 ##########################################################################
@@ -26,5 +26,4 @@ from .models import Faculty, Instructor, Advisor
 ##########################################################################
 
 admin.site.register(Faculty)
-admin.site.register(Instructor)
-admin.site.register(Advisor)
+admin.site.register(Assignment)

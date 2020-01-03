@@ -63,6 +63,9 @@ class Cohort(TimeStampedModel):
         null=True, blank=True, default=None,
         help_text="Date that the cohort ends, e.g. the last day of Applied",
     )
+    faculty = models.ManyToManyField(
+        "faculty.Faculty", through="faculty.Assignment", related_name="cohorts",
+    )
 
     # Add a custom manager to easily select cohorts by time
     objects = CohortManager()
@@ -70,25 +73,6 @@ class Cohort(TimeStampedModel):
     class Meta:
         db_table = "cohorts"
         ordering = ("-cohort",)
-
-    def faculty(self):
-        """
-        Yields all faculty members associated with the cohort.
-        """
-        for fa in self.faculty_assignments():
-            yield fa.faculty
-
-    def faculty_assignments(self):
-        """
-        Yields all faculty assignments, starting with advisors then instructors.
-        """
-        # TODO: change to assignments query
-        for advisor in self.advisors.all():
-            yield advisor
-
-        for course in self.courses.all(select_related=True):
-            for instructor in course.instructors.all():
-                yield instructor
 
     def get_semester_display(self):
         """
@@ -159,7 +143,7 @@ class Course(TimeStampedModel):
         help_text="Date that the course ends, e.g. the last day of the course",
     )
     instructors = models.ManyToManyField(
-        "faculty.Faculty", through="faculty.Instructor", related_name="courses",
+        "faculty.Faculty", through="faculty.Assignment", related_name="courses",
     )
 
     # Add a custom manager to easily select courses by time

@@ -32,8 +32,8 @@
           <tr>
             <td>{{ person.get_full_name }}</td>
             <td>{{ person.primary_role }}</td>
-            <td>{{ person.instructional_assignments.count }}</td>
-            <td>{{ person.advisor_assignments.count }}</td>
+            <td>{{ person.assignments.instructional.count }}</td>
+            <td>{{ person.assignments.advisors.count }}</td>
           </tr>
           {% endfor %}
         </tbody>

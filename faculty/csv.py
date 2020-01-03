@@ -17,6 +17,7 @@ Handles interactions between the database and CSV files for Excel support.
 ## Imports
 ##########################################################################
 
+import re
 import csv
 
 from django.apps import apps
@@ -52,9 +53,10 @@ def parse_assignments(cohort_rows):
 
         # Get or create the cohort by cohort number and semester
         Cohort = apps.get_model(app_label="cohort", model_name="Cohort")
+        semester, section = parse_cohort_semester(assignment_rows)
         cohort, created = Cohort.objects.get_or_create(
             cohort=int(cohort),
-            semester=assignment_rows[0]["Semester"].split()[0][:2].upper(),
+            semester=semester, section=section,
             start=find_course_date(assignment_rows, "Foundations", "Start Date"),
             end=find_course_date(assignment_rows, "Applied", "End Date"),
         )
@@ -153,13 +155,16 @@ def parse_instructor(row, faculty, course):
     Get or create an instructor assignment from the faculty and the course information.
     """
     kwargs = {
+        "cohort": course.cohort,
         "course": course,
         "faculty": faculty,
         "effort": int(row["Effort (%)"]) if row["Effort (%)"] else None,
         "primary": True,
+        "start": parse_date(row, "Start Date", True),
+        "end": parse_date(row, "End Date", True),
     }
 
-    Instructor = apps.get_model(app_label="faculty", model_name="Instructor")
+    Instructor = apps.get_model(app_label="faculty", model_name="Assignment")
     return Instructor.objects.get_or_create(**kwargs)
 
 
@@ -181,9 +186,11 @@ def parse_advisor(row, cohort, faculty):
         "hours": int(row["Hours"]) if row["Hours"] else None,
         "effort": int(row["Effort (%)"]) if row["Effort (%)"] else None,
         "primary": True,
+        "start": parse_date(row, "Start Date", True),
+        "end": parse_date(row, "End Date", True),
     }
 
-    Advisor = apps.get_model(app_label="faculty", model_name="Advisor")
+    Advisor = apps.get_model(app_label="faculty", model_name="Assignment")
     return Advisor.objects.get_or_create(**kwargs)
 
 
@@ -217,3 +224,15 @@ def find_course_date(rows, course_prefix, field="Start Date", allow_null=True):
         if row["Course Title"].startswith(course_prefix):
             return parse_date(row, field, allow_null)
     raise ValueError("could not find course with prefix '{}'".format(course_prefix))
+
+
+SEMRE = re.compile(
+    r'^(?P<full_semester>(?P<semester>Spring|Summer|Fall) (?P<year>\d{4}))\s*(?P<section>[ABC]?)$', re.I
+)
+
+def parse_cohort_semester(rows):
+    match = SEMRE.match(rows[0]["Semester"])
+    if not match:
+        raise ValueError(f"could not parse '{rows[0]['Semester']}'")
+    groups = match.groupdict()
+    return groups["semester"][0:2].upper(), groups.get("section", None) or None

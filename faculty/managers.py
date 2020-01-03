@@ -38,9 +38,8 @@ class AssignmentQuerySet(models.QuerySet):
             raise ValueError("specify at least one faculty to filter on")
 
         qor = [
-            Q(**{f"{relation}__faculty":faculty})
+            Q(faculty=faculty)
             for faculty in faculty
-            for relation in self.REL_FIELDS
         ]
         query = qor[0]
         for item in qor[1:]:
@@ -58,11 +57,9 @@ class AssignmentQuerySet(models.QuerySet):
         qor = []
         for cohort in cohorts:
             if isinstance(cohort, int):
-                qor.append(Q(advisor__cohort__cohort=cohort))
-                qor.append(Q(instructor__course__cohort__cohort=cohort))
+                qor.append(cohort__cohort=cohort)
             else:
-                qor.append(Q(advisor__cohort=cohort))
-                qor.append(Q(instructor__course__cohort=cohort))
+                qor.append(Q(cohort=cohort))
 
         query = qor[0]
         for item in qor[1:]:
@@ -70,14 +67,17 @@ class AssignmentQuerySet(models.QuerySet):
 
         return self.filter(query)
 
-    def roles(self):
+    def instructional(self):
         """
-        Returns all the role values from the specified query
+        Return only assignments that have associated courses.
         """
-        return chain(*[
-            list(chain(*self.filter(content_type__model=field).values_list(f"{field}__role")))
-            for field in self.REL_FIELDS
-        ])
+        return self.exclude(course__isnull=True)
+
+    def advisors(self):
+        """
+        Return only assignments that do not have an associated course.
+        """
+        return self.exclude(course__isnull=False)
 
 
 class AssignmentManager(models.Manager):
@@ -96,3 +96,15 @@ class AssignmentManager(models.Manager):
         Filter the assignments based on the specified cohorts
         """
         return self.get_queryset().cohort(*cohorts)
+
+    def instructional(self):
+        """
+        Return only assignments that have associated courses.
+        """
+        return self.get_queryset().instructional()
+
+    def advisors(self):
+        """
+        Return only assignments that do not have an associated course.
+        """
+        return self.get_queryset().advisors()

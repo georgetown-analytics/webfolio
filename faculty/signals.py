@@ -18,59 +18,35 @@ Signals used by faculty models - imported by the apps.py configuration.
 ##########################################################################
 
 from django.dispatch import receiver
-from django.db.models.signals import post_save, post_delete
-from faculty.models import Assignment, Instructor, Advisor
-from django.contrib.contenttypes.models import ContentType
+from django.db.models.signals import pre_save
+
+from faculty.models import Assignment
 
 
-def create_assignment(sender, instance, created, **kwargs):
+@receiver(pre_save, sender=Assignment, dispatch_uid="check_assignment_defaults")
+def check_assignment_defaults(sender, instance, **kwargs):
     """
-    Create an generic assignment when a type-specific assignment is saved.
+    Ensure that the assignment defaults are correctly set from blank fields before save.
     """
-    content_type = ContentType.objects.get_for_model(instance)
+    # This does not validate, it just assigns the cohort to the course cohort if it can
+    if not instance.cohort and instance.course is not None:
+        instance.cohort = instance.course.cohort
 
-    # Don't use get_or_create to prevent multiple DB queries
-    try:
-        assignment = Assignment.objects.get(
-            content_type=content_type, object_id=instance.id
-        )
-    except Assignment.DoesNotExist:
-        assignment = Assignment(content_type=content_type, object_id=instance.id)
+    # Assign the start date of the assignment to the course or cohort default.
+    if not instance.start:
+        if instance.course is not None:
+            instance.start = instance.course.start
+        elif instance.cohort is not None:
+            instance.start = instance.cohort.start
 
-    assignment.created = instance.created
-    assignment.modified = instance.modified
-    assignment.save()
+    # Assign the end date of the assignment to the course or cohort default.
+    # This must be separate from start to ensure that the default is used correctly.
+    if not instance.end:
+        if instance.course is not None:
+            instance.end = instance.course.end
+        elif instance.cohort is not None:
+            instance.end = instance.cohort.end
 
-
-def delete_assignment(sender, instance, **kwargs):
-    """
-    Delete an generic assignment when a type-specific assignment is deleted.
-    """
-    content_type = ContentType.objects.get_for_model(instance)
-    try:
-        assignment = Assignment.objects.get(
-            content_type=content_type, object_id=instance.id
-        )
-        assignment.delete()
-    except Assignment.DoesNotExist:
-        pass
-
-
-@receiver(post_save, sender=Instructor, dispatch_uid="create_instructional_assignment")
-def create_instructional_assignment(sender, instance, created, **kwargs):
-    return create_assignment(sender, instance, created, **kwargs)
-
-
-@receiver(post_save, sender=Advisor, dispatch_uid="create_advisor_assignment")
-def create_advisor_assignment(sender, instance, created, **kwargs):
-    return create_assignment(sender, instance, created, **kwargs)
-
-
-@receiver(post_delete, sender=Instructor, dispatch_uid="delete_instructional_assignment")
-def delete_instructional_assignment(sender, instance, **kwargs):
-    return delete_assignment(sender, instance, **kwargs)
-
-
-@receiver(post_delete, sender=Advisor, dispatch_uid="delete_advisor_assignment")
-def delete_advisor_assignment(sender, instance, **kwargs):
-    return delete_assignment(sender, instance, **kwargs)
+    # Assign the number of hours if available on the course
+    if not instance.hours and instance.course is not None:
+        instance.hours = instance.course.hours

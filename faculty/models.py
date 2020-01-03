@@ -107,8 +107,9 @@ class Faculty(TimeStampedModel):
         Returns the most common assignment this faculty member has had.
         """
         # TODO: this hack is going to lead to poor performance
-        roles = Counter(Assignment.objects.faculty(self).roles())
-        return FACULTY_ROLES[roles.most_common(1)[0][0]]
+        roles = self.assignments.values('role').annotate(count=models.Count("role"))
+        roles = roles.order_by("-count")[0:1]
+        return FACULTY_ROLES[roles[0]["role"]]
 
     def __str__(self):
         return self.get_full_name()
@@ -120,49 +121,43 @@ class Faculty(TimeStampedModel):
 
 class Assignment(TimeStampedModel):
     """
-    Assignments join both instructional and advisorial assignments and relate them to a
-    single paid contract. This table uses ContentTypes to join the different assignment
-    types into a single queryable model.
+    Faculty assignments link instructors to a cohort either through a role (e.g.
+    Capstone Advisor) or through a course (e.g. an instructional assignment).
+    Assignments also generally have one contract associated with them (e.g. a completed
+    contractual agreement with the faculty member). Courses taught by multiple
+    instructors will have multiple assignments associated with them.
     """
 
-    content_type = models.ForeignKey(
-        ContentType, on_delete=models.CASCADE, null=False, blank=False,
-        help_text="The model type of the assignment object, e.g. Instructor or Assignment",
-    )
-    object_id = models.PositiveSmallIntegerField(
-        null=False, blank=False,
-        help_text="The primary key of the assignment object."
-    )
-    content_object = GenericForeignKey('content_type', 'object_id')
-
-    # Use a custom manager for better queries
-    objects = AssignmentManager()
-
-    class Meta:
-        db_table = "assignments"
-        ordering = ("-created",)
-        unique_together = ("content_type", "object_id")
-
-    def __str__(self):
-        return str(self.content_object)
-
-
-class Instructor(TimeStampedModel):
-    """
-    A faculty assignment to teach a specific class or workshop. This is a different
-    from a TA or Capstone advising assignment since it directly links faculty members
-    to courses along with their instructional responsibility.
-    """
-
-    course = models.ForeignKey(
-        "cohort.Course", on_delete=models.CASCADE, null=False, blank=False,
-        related_name="instructional_assignments",
-        help_text="The course the faculty is being assigned to",
-    )
     faculty = models.ForeignKey(
         "Faculty", on_delete=models.CASCADE, null=False, blank=False,
+        related_name="assignments",
+        help_text="Faculty member who is instructing a course or advising the cohort",
+    )
+    cohort = models.ForeignKey(
+        "cohort.Cohort", on_delete=models.CASCADE, null=False, blank=True,
         related_name="instructional_assignments",
-        help_text="The faculty member that is instructing the course",
+        help_text="Must specify if a course is not set, otherwise will default to course cohort",
+    )
+    course = models.ForeignKey(
+        "cohort.Course", on_delete=models.CASCADE, null=True, blank=True, default=None,
+        related_name="instructional_assignments",
+        help_text="If the role is instructor, specify the course the faculty is teaching",
+    )
+    role = models.CharField(
+        max_length=2, choices=FACULTY_ROLES, default=FACULTY_ROLES.Instructor,
+        null=False, blank=True, help_text="The role of the faculty member in the cohort",
+    )
+    start = models.DateField(
+        null=True, blank=True, default=None,
+        help_text="The start date of the assignment (defaults to course/cohort start)",
+    )
+    end = models.DateField(
+        null=True, blank=True, default=None,
+        help_text="The end date of the assignment (defaults to course/cohort end)",
+    )
+    hours = models.PositiveSmallIntegerField(
+        null=True, blank=True, default=None,
+        help_text="The number of instructional hours assigned to the advisor (defaults to course hours)",
     )
     effort = models.PositiveSmallIntegerField(
         null=True, blank=True, default=100,
@@ -171,67 +166,31 @@ class Instructor(TimeStampedModel):
     )
     primary = models.BooleanField(
         default=True, null=False,
-        help_text="If this instructor has primary responsibility for the course"
+        help_text="If this instructor has primary responsibility for the course or advisor role"
     )
-    role = models.CharField(
-        max_length=2, choices=FACULTY_ROLES, default=FACULTY_ROLES.Instructor,
-        null=False, blank=True, help_text="The role of the faculty member in the cohort",
-    )
-    assignment = GenericRelation(Assignment, related_query_name="instructor")
+
+    # Use a custom manager for better queries
+    objects = AssignmentManager()
 
     class Meta:
-        db_table = "instructors"
-        ordering = ("-course__start",)
-        unique_together = ("course", "faculty")
-        verbose_name = "Instructional assignment"
+        db_table = "assignments"
+        ordering = ("-start", "-cohort__cohort")
+        unique_together = ("faculty", "cohort", "course", "role")
+
+    @property
+    def is_instructor(self):
+        """
+        Any role can be an "instructional role" (e.g. TA), but this is only an
+        instructional assignment if there is a course associated with it.
+        """
+        return self.course is not None
 
     def __str__(self):
+        if self.is_instructor:
+            s = f"{self.faculty} teaching {self.course}"
+        else:
+            s = f"{self.faculty} Cohort {self.cohort.cohort} {self.get_role_display()}"
+
         if self.effort and self.effort != 100:
-            return "{} teaching {} ({}%)".format(self.faculty, self.course, self.effort)
-        return "{} teaching {}".format(self.faculty, self.course)
-
-
-class Advisor(TimeStampedModel):
-    """
-    A faculty assignment to provide instructional support throughout a cohort. This is
-    different from an instructional role because the
-    """
-
-    cohort = models.ForeignKey(
-        "cohort.Cohort", on_delete=models.CASCADE, null=False, blank=False,
-        related_name="advisors", help_text="The cohort the faculty is being assigned to",
-    )
-    faculty = models.ForeignKey(
-        "Faculty", on_delete=models.CASCADE, null=False, blank=False,
-        related_name="advisor_assignments",
-        help_text="The faculty member that is advising the cohort",
-    )
-    role = models.CharField(
-        max_length=2, choices=FACULTY_ROLES, null=False, blank=True,
-        help_text="The role of the faculty member in the cohort",
-    )
-    hours = models.PositiveSmallIntegerField(
-        null=True, blank=True,
-        help_text="The number of instructional hours assigned to the advisor",
-    )
-    effort = models.PositiveSmallIntegerField(
-        null=True, blank=True, default=100,
-        validators=[MinValueValidator(1), MaxValueValidator(100)],
-        help_text="Percent of effort/responsibility the advisor is assigned",
-    )
-    primary = models.BooleanField(
-        default=True, null=False,
-        help_text="If this advisor has primary responsibility for the cohort"
-    )
-    assignment = GenericRelation(Assignment, related_query_name="advisor")
-
-    class Meta:
-        db_table = "advisors"
-        ordering = ("-cohort__start",)
-        unique_together = ("cohort", "faculty", "role")
-        verbose_name = "Advising assignment"
-
-    def __str__(self):
-        if self.effort and self.effort != 100:
-            return "{} Cohort {} {} ({}%)".format(self.faculty, self.cohort.cohort, self.get_role_display(), self.effort)
-        return "{} Cohort {} {}".format(self.faculty, self.cohort.cohort, self.get_role_display())
+            s += f" ({self.effort}%)"
+        return s

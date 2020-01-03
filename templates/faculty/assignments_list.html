@@ -30,15 +30,14 @@
         <tbody>
           {% for assignment in assignments %}
           <tr>
-            <td>{{ assignment.content_object.faculty.get_full_name }}</td>
-            {% if assignment.content_type.model == "instructor" %}
-            <td>{{ assignment.content_object.course.cohort.cohort }}</td>
-            <td>{{ assignment.content_object.course.title }}</td>
+            <td>{{ assignment.faculty.get_full_name }}</td>
+            <td>{{ assignment.cohort.cohort }}</td>
+            {% if assignment.is_instructor %}
+            <td>{{ assignment.course.title }}</td>
             {% else %}
-            <td>{{ assignment.content_object.cohort.cohort }}</td>
-            <td>{{ assignment.content_object.get_role_display }}</td>
+            <td>{{ assignment.get_role_display }}</td>
             {% endif %}
-            <td>{{ assignment.content_object.effort }}%</td>
+            <td>{{ assignment.effort }}%</td>
           </tr>
           {% endfor %}
         </tbody>
