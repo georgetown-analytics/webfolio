@@ -143,6 +143,18 @@
                   </tr>
                 </thead>
                 <tbody>
+                  {% for advisor in cohort.instructional_assignments.advisors.all %}
+                  <tr class="table-info">
+                    <td class="table-info">{{ advisor.get_role_display }}</td>
+                    <td class="table-info">{{ advisor.faculty.get_full_name }}</td>
+                    <td class="table-info">{{ advisor.start }}</td>
+                    <td class="table-info">{{ advisor.end }}</td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                    <td class="table-danger text-center" colspan="4">No advisors have been added to the cohort.</td>
+                  </tr>
+                  {% endfor %}
                   {% for course in cohort.courses.all %}
                   <tr>
                     <td>{{ course.title }}</td>
@@ -152,7 +164,7 @@
                   </tr>
                   {% empty %}
                   <tr>
-                    <td colspan="4">No courses have been added to the cohort.</td>
+                    <td class="table-danger text-center" colspan="4">No courses have been added to the cohort.</td>
                   </tr>
                   {% endfor %}
                 </tbody>
