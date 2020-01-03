@@ -14,6 +14,7 @@ Defines cohorts and their classes
 """
 
 ##########################################################################
-## Imports
+## Configuration
 ##########################################################################
 
+default_app_config = 'cohort.apps.CohortConfig'

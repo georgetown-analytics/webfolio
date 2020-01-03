@@ -21,4 +21,8 @@ from django.apps import AppConfig
 
 
 class CohortConfig(AppConfig):
+
     name = 'cohort'
+
+    def ready(self):
+        import cohort.signals # noqa

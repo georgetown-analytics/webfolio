@@ -115,8 +115,13 @@ class Course(TimeStampedModel):
     """
 
     cohort = models.ForeignKey("Cohort",
-        null=False, blank=False, on_delete=models.CASCADE, related_name="courses",
-        help_text="The cohort taking this course",
+        null=True, blank=True, default=None,
+        on_delete=models.CASCADE, related_name="courses",
+        help_text="The cohort that this course is a part of (if data science)",
+    )
+    semester = models.CharField(
+        max_length=2, choices=SEMESTER, null=False, blank=True,
+        help_text="The academic semester the course is in (uses cohort semester by default)",
     )
     course_id = models.CharField(
         max_length=55, null=False, blank=False, db_index=True, verbose_name="Course ID",
@@ -154,8 +159,24 @@ class Course(TimeStampedModel):
         ordering = ("-cohort__cohort", "start")
         unique_together = ("course_id", "section")
 
+    def get_semester_display(self):
+        """
+        Effective string representation of the Semester
+        """
+        if self.cohort:
+            return self.cohort.get_semester_display()
+
+        year = ""
+        if self.start:
+            year = self.start.strftime("%Y")
+
+        sem = f"{SEMESTER[self.semester].title()} {year}"
+        return sem.strip()
+
     def __str__(self):
-        return "{} -- {}".format(self.title, self.cohort)
+        if self.cohort:
+            return f"{self.title} -- {self.cohort}"
+        return f"{self.title} -- {self.get_semester_display()}"
 
 
 ##########################################################################
