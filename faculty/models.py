@@ -80,10 +80,43 @@ class Faculty(TimeStampedModel):
         max_length=4, null=True, blank=True, choices=NAME_SUFFIX, default=None,
         help_text="Suffix for the faculty member's display name",
     )
+    email = models.EmailField(
+        null=True, blank=True,
+        help_text="Preferred contact email for faculty and students",
+    )
+    occupation = models.CharField(
+        max_length=255, null=True, blank=True,
+        help_text="Title or role of your non-Georgetown related occupation",
+    )
+    organization = models.CharField(
+        max_length=255, null=True, blank=True,
+        help_text="The organization you work for outside of Georgetown",
+    )
+    bio = models.CharField(
+        max_length=1000, null=True, blank=True,
+        help_text="Short bio describing your data science activities",
+    )
+    github = models.CharField(
+        max_length=100, null=True, blank=True,
+        help_text="Optional GitHub username (no url or @ symbol prefix)"
+    )
+    twitter = models.CharField(
+        max_length=100, null=True, blank=True,
+        help_text="Optional Twitter username (no url or @ symbol prefix)"
+    )
+    linkedin = models.URLField(
+        null=True, blank=True,
+        help_text="Optional URL of your LinkedIn profile"
+    )
     hourly_rate = models.DecimalField(
         max_digits=10, decimal_places=2, blank=True, null=True, default=0.0,
         help_text="Expected hourly rate of faculty, used for contract validation",
     )
+    exclude = models.BooleanField(
+        default=False, null=False,
+        help_text="Exclude from active faculty participation (archive only)",
+    )
+
 
     class Meta:
         db_table = "faculty"
@@ -102,6 +135,18 @@ class Faculty(TimeStampedModel):
             fn += ", " + self.suffix
         return fn
 
+    def get_email(self):
+        """
+        Determines the email address of the faculty member based on preferences.
+        """
+        if self.email:
+            return self.email
+        if self.user.email:
+            return self.user.email
+        if self.netid:
+            return "{}@georgetown.edu".format(self.netid)
+        return None
+
     def primary_role(self):
         """
         Returns the most common assignment this faculty member has had.
@@ -110,6 +155,12 @@ class Faculty(TimeStampedModel):
         roles = self.assignments.values('role').annotate(count=models.Count("role"))
         roles = roles.order_by("-count")[0:1]
         return FACULTY_ROLES[roles[0]["role"]]
+
+    def gravatar(self, size=35):
+        email = self.get_email() or ""
+        email_hash = md5(str(email.strip().lower()).encode('utf-8')).hexdigest()
+        url = "//www.gravatar.com/avatar/{0}?s={1}&d=identicon&r=PG"
+        return url.format(email_hash, size)
 
     def __str__(self):
         return self.get_full_name()

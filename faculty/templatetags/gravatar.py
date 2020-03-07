@@ -29,6 +29,11 @@ register = template.Library()
 
 @register.filter(name='gravatar')
 def gravatar(user, size=35):
+    if hasattr(user, "faculty") and user.faculty is not None:
+        email = user.faculty.get_email()
+    else:
+        email = user.email
+
     email = str(user.email.strip().lower()).encode('utf-8')
     email_hash = md5(email).hexdigest()
     url = "//www.gravatar.com/avatar/{0}?s={1}&d=identicon&r=PG"

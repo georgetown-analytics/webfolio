@@ -17,10 +17,12 @@ Signals used by faculty models - imported by the apps.py configuration.
 ## Imports
 ##########################################################################
 
+from django.db.models import Q
 from django.dispatch import receiver
 from django.db.models.signals import pre_save
+from django.contrib.auth.signals import user_logged_in
 
-from faculty.models import Assignment
+from faculty.models import Faculty, Assignment
 
 
 @receiver(pre_save, sender=Assignment, dispatch_uid="check_assignment_defaults")
@@ -50,3 +52,30 @@ def check_assignment_defaults(sender, instance, **kwargs):
     # Assign the number of hours if available on the course
     if not instance.hours and instance.course is not None:
         instance.hours = instance.course.hours
+
+
+
+
+@receiver(user_logged_in)
+def associate_faculty_profile(sender, user, request, **kwargs):
+    # Check if user has an associated faculty member
+    if not hasattr(user, "faculty") or user.faculty is None:
+        # Search for faculty
+        query = Q(netid=user.username) | (Q(first_name=user.first_name) & Q(last_name=user.last_name))
+        query = Faculty.objects.filter(query)
+        if query.count() == 1:
+            profile = query.first()
+            user.faculty = profile
+            user.save()
+
+            changed = False
+            if not profile.netid:
+                profile.netid = user.username
+                changed = True
+
+            if not profile.email:
+                profile.email = user.email
+                changed = True
+
+            if changed:
+                profile.save()
