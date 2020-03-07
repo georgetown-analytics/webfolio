@@ -1,4 +1,6 @@
 {% load gravatar %}
+{% load static %}
+
 <!-- Topbar -->
 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
@@ -42,6 +44,56 @@
             </div>
           </div>
         </form>
+      </div>
+    </li>
+
+    <!-- Nav Item - External Links -->
+    <li class="nav-item dropdown no-arrow mx-1">
+      <a class="nav-link dropdown-toggle" href="#" id="externalLinksDropdown" role="button" data-toggle="dropdown"
+        aria-haspopup="true" aria-expanded="false">
+        <i class="fas fa-external-link-square-alt fa-fw"></i>
+      </a>
+      <!-- Dropdown - External Links -->
+      <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+        aria-labelledby="externalLinksDropdown">
+        <h6 class="dropdown-header">
+          External Links
+        </h6>
+        <a class="dropdown-item d-flex align-items-center" href="https://github.com/georgetown-analytics/" target="_blank">
+          <div class="dropdown-list-image mr-3">
+            <img class="rounded-circle" src="{% static 'img/github.png' %}" alt="GitHub Icon">
+          </div>
+          <div>
+            <span class="font-weight-bold">GitHub Repositories</span>
+          </div>
+        </a>
+        <a class="dropdown-item d-flex align-items-center" href="https://scs.georgetown.edu/programs/375/certificate-in-data-science/" target="_blank">
+          <div class="dropdown-list-image mr-3">
+            <img class="rounded-circle" src="{% static 'img/seal-icon-dark.png' %}" alt="Georgetown Seal">
+          </div>
+          <div>
+            <span class="font-weight-bold">Certificate Descriptions</span>
+          </div>
+        </a>
+        <a class="dropdown-item d-flex align-items-center" href="http://canvas.georgetown.edu/" target="_blank">
+          <div class="dropdown-list-image mr-3">
+            <img class="rounded-circle" src="{% static 'img/canvas.png' %}" alt="Canvas Logo">
+          </div>
+          <div>
+            <span class="font-weight-bold">Canvas Course Management</span>
+          </div>
+        </a>
+        <a class="dropdown-item d-flex align-items-center" href="https://gms.georgetown.edu/" target="_blank">
+          <div class="dropdown-list-image mr-3">
+            <img class="rounded-circle" src="{% static 'img/georgetown-g.png' %}" alt="Georgetown Logo">
+          </div>
+          <div>
+            <span class="font-weight-bold">Georgetown Management System</span>
+          </div>
+        </a>
+        <a class="dropdown-item text-center small text-gray-500" href="#" role="button" data-toggle="collapse" data-target="externalLinksDropdown">
+          <i class="fas fa-caret-up fa-fw"></i>
+        </a>
       </div>
     </li>
 

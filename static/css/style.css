@@ -1,1 +1,28 @@
 /* Webfolio Styles */
+
+/* See: https://www.georgetown.edu/color-guide/ */
+:root {
+    --primary: #012169;
+    --secondary: #BBBCBC;
+    --success: #64A70B;
+    --info: #00B5E2;
+    --warning: #F8E08E;
+    --danger: #D50032;
+    --light: #D6D2C4;
+    --dark: #041E42;
+}
+
+.bg-gradient-primary {
+    background-color: #041E42;
+    background-image: linear-gradient(180deg,#012169 50%,#041E42 100%);
+    background-size: cover;
+}
+
+.sidebar .sidebar-brand img {
+    width: 40px;
+    height: 40px;
+}
+
+.sidebar .sidebar-brand-text {
+    font-family: 'adobe-caslon-pro', Times, serif;
+}
