@@ -33,8 +33,8 @@ from django.contrib import admin
 from rest_framework import routers
 from django.urls import path, include
 
-from faculty.views import UnassociatedFacultyView
 from webfolio.views import HeartbeatViewSet, Overview
+from faculty.views import UnassociatedFacultyView, ContactsListView
 from cohort.views import CohortListView, CourseListView, CapstoneListView
 from faculty.views import FacultyListView, AssignmentListView, FacultyDetailView
 
@@ -65,6 +65,7 @@ urlpatterns = [
     path("cohorts/", CohortListView.as_view(), name="cohort_list"),
     path("courses/", CourseListView.as_view(), name="course_list"),
     path("capstones/", CapstoneListView.as_view(), name="capstone_list"),
+    path("contacts/", ContactsListView.as_view(), name="contact_list"),
     path("faculty/", FacultyListView.as_view(), name="faculty_list"),
     path("faculty/assignments/", AssignmentListView.as_view(), name="assignment_list"),
     path("faculty/unassociated/", UnassociatedFacultyView.as_view(), name="faculty_unassociated"),
