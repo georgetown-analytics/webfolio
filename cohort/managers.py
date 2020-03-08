@@ -64,7 +64,7 @@ class TimeRangeQuerySet(models.QuerySet):
         today = date.today()
         return self.filter(start__lte=today, end__gte=today)
 
-    def upcomming(self):
+    def upcoming(self):
         """
         Include only objects that are scheduled to occur in the future.
         """
@@ -88,11 +88,11 @@ class TimeRangeManager(models.Manager):
         """
         return self.get_queryset().current()
 
-    def upcomming(self):
+    def upcoming(self):
         """
         Include only objects that are scheduled to occur in the future.
         """
-        return self.get_queryset().upcomming()
+        return self.get_queryset().upcoming()
 
 
 ##########################################################################

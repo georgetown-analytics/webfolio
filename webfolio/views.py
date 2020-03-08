@@ -60,7 +60,7 @@ class Overview(LoginRequiredMixin, TemplateView):
         context["page"] = "overview"
         context["next_capstone_presentations"] = self.get_next_capstone_presentations()
         context["num_active_courses"] = Course.objects.current().count()
-        context["num_upcomming_courses"] = Course.objects.upcomming().count()
+        context["num_upcoming_courses"] = Course.objects.upcoming().count()
         context["cohort_progress"] = self.get_cohort_progress()
         context["current_cohorts"] = Cohort.objects.order_by("end").ends_after(date.today())[0:3]
         return context

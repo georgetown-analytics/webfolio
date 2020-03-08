@@ -17,8 +17,8 @@ Faculty app views.
 ## Imports
 ##########################################################################
 
-from django.views.generic import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView, DetailView, TemplateView
 
 from faculty.models import Faculty, Assignment
 
@@ -32,6 +32,22 @@ class FacultyListView(ListView, LoginRequiredMixin):
         context = super(FacultyListView, self).get_context_data(**kwargs)
         context["page"] = "faculty/faculty"
         return context
+
+
+class FacultyDetailView(DetailView, LoginRequiredMixin):
+
+    model = Faculty
+    context_object_name = "faculty"
+
+    def get_context_data(self, **kwargs):
+        context = super(FacultyDetailView, self).get_context_data(**kwargs)
+        context["page"] = "faculty/faculty"
+        return context
+
+
+class UnassociatedFacultyView(TemplateView, LoginRequiredMixin):
+
+    template_name = "faculty/unassociated.html"
 
 
 class AssignmentListView(ListView, LoginRequiredMixin):

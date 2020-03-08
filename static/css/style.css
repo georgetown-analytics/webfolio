@@ -26,3 +26,8 @@
 .sidebar .sidebar-brand-text {
     font-family: 'adobe-caslon-pro', Times, serif;
 }
+
+.big-number {
+    font-size: 2em;
+    font-weight: bold;
+}

@@ -1,0 +1,72 @@
+{% extends "page.html" %}
+{% load static %}
+
+{% block title %}{{ faculty.get_full_name }} | Faculty{% endblock %}
+
+{% block page %}
+
+<div class="row">
+  <div class="col-lg-4">
+    <div class="card mb-4">
+      <div class="card-body">
+        <img src="{{ faculty.gravatar }}" class="img-fluid mb-3 rounded" alt="{{ faculty.get_full_name }}">
+        <div class="text-center">
+          <h4 class="mb-1">{{ faculty.get_full_name }}</h4>
+          <h5 class="mt-0">{{ faculty.primary_role }}</h5>
+        </div>
+        <div class="d-flex flex-row justify-content-around mt-3 text-dark">
+          <div class="text-center">
+            <div class="big-number mb-0">{{ faculty.assignments.instructional.count }}</div>
+            <div class="mt-0">Courses</div>
+          </div>
+          <div class="text-center">
+            <div class="big-number mb-0">{{ faculty.assignments.advisors.count }}</div>
+            <div class="mt-0">Assignments</div>
+          </div>
+          <div class="text-center">
+            <div class="big-number mb-0">{{ faculty.cohorts.distinct.count }}</div>
+            <div class="mt-0">Cohorts</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="card mb-4">
+      <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Course Schedule</h6>
+      </div>
+      <div class="card-body">
+        {% if faculty.current_courses.count > 0 %}
+        <h5 class="bold text-dark">Currently Teaching</h6>
+        <ul class="list-unstyled">
+        {% for course in faculty.current_courses %}
+          <li class="mb-2">
+            <div>{{ course }}</div>
+            <div class="small text-gray-500">{{ course.start }} - {{ course.end }}</div>
+          </li>
+        {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% if faculty.upcoming_courses.count > 0 %}
+        <h5 class="bold text-dark">Upcoming Courses</h6>
+        <ul class="list-unstyled">
+          {% for course in faculty.upcoming_courses %}
+          <li class="mb-2">
+            <div>{{ course }}</div>
+            <div class="small text-gray-500">{{ course.start }} - {{ course.end }}</div>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <h5 class="bold text-dark">No Upcoming Courses</h6>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

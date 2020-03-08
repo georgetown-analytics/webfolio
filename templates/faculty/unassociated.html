@@ -1,0 +1,27 @@
+{% extends "page.html" %}
+
+{% block title %}Unassociated Faculty Error{% endblock %}
+
+{% block page %}
+<div class="d-flex flex-row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card shadow mb-4 border-bottom-danger">
+      <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-danger">Unassociated User</h6>
+      </div>
+      <div class="card-body">
+        <p>
+        If you are receiving this message and you are a faculty member, then something
+        has gone wrong associating your NetID with your profile. Please contact the
+        web admin or faculty director to resolve the issue.
+        </p>
+        <p>
+        If you are not a faculty member, then this message simply means that you do not
+        have a profile. Sorry for the danger text, but please feel free to view
+        other pages!
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -17,7 +17,9 @@ Faculty app database models.
 ## Imports
 ##########################################################################
 
+from hashlib import md5
 from django.db import models
+from django.urls import reverse
 from model_utils import Choices
 from collections import Counter
 from django.conf import settings
@@ -56,6 +58,10 @@ class Faculty(TimeStampedModel):
     if necessary. Faculty can be assigned to courses and roles for each cohort.
     """
 
+    slug = models.SlugField(
+        max_length=80, null=False, blank=True, editable=False, unique=True,
+        help_text="Slug field to uniquely identify faculty in URLs (based off of name)",
+    )
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
         help_text="The user associated with the faculty member (optional)",
@@ -141,7 +147,7 @@ class Faculty(TimeStampedModel):
         """
         if self.email:
             return self.email
-        if self.user.email:
+        if self.user and self.user.email:
             return self.user.email
         if self.netid:
             return "{}@georgetown.edu".format(self.netid)
@@ -156,11 +162,20 @@ class Faculty(TimeStampedModel):
         roles = roles.order_by("-count")[0:1]
         return FACULTY_ROLES[roles[0]["role"]]
 
-    def gravatar(self, size=35):
+    def gravatar(self, size=512):
         email = self.get_email() or ""
         email_hash = md5(str(email.strip().lower()).encode('utf-8')).hexdigest()
         url = "//www.gravatar.com/avatar/{0}?s={1}&d=identicon&r=PG"
         return url.format(email_hash, size)
+
+    def current_courses(self):
+        return self.courses.current().order_by("start")
+
+    def upcoming_courses(self):
+        return self.courses.upcoming().order_by("start")
+
+    def get_absolute_url(self):
+        return reverse("faculty_detail", kwargs={"slug": self.slug})
 
     def __str__(self):
         return self.get_full_name()

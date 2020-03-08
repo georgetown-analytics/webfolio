@@ -30,7 +30,9 @@
         <tbody>
           {% for person in faculty %}
           <tr>
-            <td>{{ person.get_full_name }}</td>
+            <td>
+              <a href="{{ person.get_absolute_url }}">{{ person.get_full_name }}</a>
+            </td>
             <td>{{ person.primary_role }}</td>
             <td>{{ person.assignments.instructional.count }}</td>
             <td>{{ person.assignments.advisors.count }}</td>
