@@ -86,17 +86,19 @@
         <h6 class="float-left m-2 font-weight-bold text-primary">Administration Contacts</h6>
       </div>
       <div class="card-body">
-        {% for row in contacts.active %}
-        <div class="contact mb-2">
-          <div class="h6 mb-0 font-weight-bold text-gray-800">{{ row.full_name }}</div>
-          <div class="small text-lowercase mt-1">
-            <a href="{{ row.full_email }}" target="_blank">
-              {{ row.email }}
-            </a>
+        <div class="row">
+          {% for row in contacts.active %}
+          <div class="contact col-lg-6 mb-2">
+            <div class="h6 mb-0 font-weight-bold text-gray-800">{{ row.full_name }}</div>
+            <div class="small text-lowercase mt-1">
+              <a href="{{ row.full_email }}" target="_blank">
+                {{ row.email }}
+              </a>
+            </div>
+            <p class="small text-dark">{{ row.info }}</p>
           </div>
-          <p class="small text-dark">{{ row.info }}</p>
+          {% endfor %}
         </div>
-        {% endfor %}
       </div>
     </div>
   </div>
