@@ -23,9 +23,9 @@ from django.urls import reverse
 from model_utils import Choices
 from collections import Counter
 from django.conf import settings
-from faculty.managers import AssignmentManager
 from model_utils.models import TimeStampedModel
 from django.contrib.contenttypes.models import ContentType
+from faculty.managers import AssignmentManager, ContactManager
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 
@@ -260,3 +260,57 @@ class Assignment(TimeStampedModel):
         if self.effort and self.effort != 100:
             s += f" ({self.effort}%)"
         return s
+
+
+##########################################################################
+## Administration Contacts
+##########################################################################
+
+class Contact(TimeStampedModel):
+
+    first_name = models.CharField(
+        max_length=80, null=False, blank=False,
+        help_text="First name of the contact",
+    )
+    last_name = models.CharField(
+        max_length=80, null=False, blank=False,
+        help_text="Last name of the contact",
+    )
+    email = models.EmailField(
+        null=False, blank=False, unique=True,
+        help_text="Email address of the contact",
+    )
+    info = models.CharField(
+        max_length=500, blank=False, null=False,
+        help_text="Describe contact's role and reasons for contacting them"
+    )
+    zorder = models.PositiveSmallIntegerField(
+        null=True, blank=True, default=0,
+        help_text="Specify the ordering of contacts, higher numbers appear earlier",
+    )
+    primary = models.BooleanField(
+        default=False,
+        help_text="A primary contact for the specified role, listed at top of page"
+    )
+    archive = models.BooleanField(
+        default=False,
+        help_text="Do not display the contact on any contact pages"
+    )
+
+    # Use a custom manager for better queries
+    objects = ContactManager()
+
+    class Meta:
+        db_table = "contacts"
+        ordering = ("-zorder", "last_name",)
+
+    @property
+    def full_name(self):
+        return "{} {}".format(self.first_name, self.last_name)
+
+    @property
+    def full_email(self):
+        return "{} <{}>".format(self.full_name, self.email)
+
+    def __str__(self):
+        return self.full_name

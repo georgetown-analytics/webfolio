@@ -6,77 +6,28 @@
 
 {% block page_body %}
 
-<!-- Faculty Contacts -->
+{% if contacts.primary.count > 0 %}
+<!-- Primary Administration Contacts -->
 <div class="row">
-  <div class="col-xl-3 col-md-6 mb-4">
+  {% for contact in contacts.primary %}
+  <div class="col-xl-4 col-md-6 mb-4">
     <div class="card border-left-primary shadow h-100 py-2">
       <div class="card-body">
-        <div class="h5 mb-0 font-weight-bold text-gray-800">Jeffrey Warner</div>
+        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ contact.full_name }}</div>
         <div class="text-xs text-lowercase my-1">
-          <a href="Jeffrey Warner <mailto:jww77@georgetown.edu>" target="_blank">
-            jww77@georgetown.edu
+          <a href="{{ contact.full_email }}" target="_blank">
+            {{ contact.email }}
           </a>
         </div>
-        <p class="small text-dark">
-          Director of Professional Certificate Programs. Contact for
-          contracts or scheduling.
-        </p>
+        <p class="small text-dark">{{ contact.info }}</p>
       </div>
     </div>
   </div>
+  {% endfor %}
+</div><!-- Primary administration contacts ends -->
+{% endif %}
 
-  <div class="col-xl-3 col-md-6 mb-4">
-    <div class="card border-left-primary shadow h-100 py-2">
-      <div class="card-body">
-        <div class="h5 mb-0 font-weight-bold text-gray-800">Elisa Sachs</div>
-        <div class="text-xs text-lowercase my-1">
-          <a href="Elisa Sachs <mailto:es1395@georgetown.edu>" target="_blank">
-            es1395@georgetown.edu
-          </a>
-        </div>
-        <p class="small text-dark">
-          Assistant Director of Professional Certificate Programs. Contact
-          for course related assistance.
-        </p>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-xl-3 col-md-6 mb-4">
-    <div class="card border-left-primary shadow h-100 py-2">
-      <div class="card-body">
-        <div class="h5 mb-0 font-weight-bold text-gray-800">Monique Singleton</div>
-        <div class="text-xs text-lowercase my-1">
-          <a href="Monique Singleton <mailto:mh1482@georgetown.edu>" target="_blank">
-            mh1482@georgetown.edu
-          </a>
-        </div>
-        <p class="small text-dark">
-          Associate Director, Enrollment Management. Contact
-          for admissions and enrollment.
-        </p>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-xl-3 col-md-6 mb-4">
-    <div class="card border-left-primary shadow h-100 py-2">
-      <div class="card-body">
-        <div class="h5 mb-0 font-weight-bold text-gray-800">Shani Sutton</div>
-        <div class="text-xs text-lowercase my-1">
-          <a href="mailto:Shani Sutton <smc96@georgetown.edu>" target="_blank">
-            smc96@georgetown.edu
-          </a>
-        </div>
-        <p class="small text-dark">
-          Enrollment Manager. Contact for most student questions and enrollment.
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
-
-
+<!-- All active faculty contacts -->
 <div class="row">
   <div class="col">
     <div class="card shadow mb-4">
@@ -123,6 +74,33 @@
       </div>
     </div>
   </div>
-</div>
+</div><!-- all active faculty contacts ends -->
 
+
+<!-- Other administration contacts -->
+{% if contacts.active.count > 0 %}
+<div class="row">
+  <div class="col">
+    <div class="card shadow mb-4">
+      <div class="card-header py-3">
+        <h6 class="float-left m-2 font-weight-bold text-primary">Administration Contacts</h6>
+      </div>
+      <div class="card-body">
+        {% for row in contacts.active %}
+        <div class="contact mb-2">
+          <div class="h6 mb-0 font-weight-bold text-gray-800">{{ row.full_name }}</div>
+          <div class="small text-lowercase mt-1">
+            <a href="{{ row.full_email }}" target="_blank">
+              {{ row.email }}
+            </a>
+          </div>
+          <p class="small text-dark">{{ row.info }}</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div><!-- other administration contacts ends -->
+{% endif %}
 {% endblock %}
+

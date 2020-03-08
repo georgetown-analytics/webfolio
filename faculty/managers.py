@@ -108,3 +108,28 @@ class AssignmentManager(models.Manager):
         Return only assignments that do not have an associated course.
         """
         return self.get_queryset().advisors()
+
+
+##########################################################################
+## Contacts Manager
+##########################################################################
+
+class ContactQuerySet(models.QuerySet):
+
+    def primary(self):
+        return self.filter(primary=True).exclude(archive=True)
+
+    def active(self):
+        return self.exclude(archive=True)
+
+
+class ContactManager(models.Manager):
+
+    def get_queryset(self):
+        return ContactQuerySet(self.model, using=self._db)
+
+    def primary(self):
+        return self.get_queryset().primary()
+
+    def active(self):
+        return self.get_queryset().active()

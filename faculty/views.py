@@ -21,7 +21,7 @@ from django.db import connection
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView, TemplateView
 
-from faculty.models import Faculty, Assignment
+from faculty.models import Faculty, Assignment, Contact
 
 
 class FacultyListView(ListView, LoginRequiredMixin):
@@ -68,9 +68,11 @@ class AssignmentListView(ListView, LoginRequiredMixin):
         return context
 
 
-class ContactsListView(TemplateView, LoginRequiredMixin):
+class ContactsListView(ListView, LoginRequiredMixin):
 
+    model = Contact
     template_name = "faculty/contact_list.html"
+    context_object_name = "contacts"
 
     def get_active_faculty(self):
         query = (
