@@ -1,0 +1,54 @@
+{% extends "page.html" %}
+{% load utils %}
+
+{% block page_title %}{{ year }} Scheduling{% endblock %}
+{% block page_heading_extra %}
+  <!-- select year form -->
+  <form method="get" action="{% url 'scheduling' %}">
+    <div class="input-group">
+      <select class="custom-select" name="year" id="year">
+        {% for y in years %}
+        <option value="{{ y }}" {% ifequal y year %} selected{% endifequal %}>{{ y }}</option>
+        {% endfor %}
+      </select>
+      <div class="input-group-append">
+        <button class="btn btn-outline-secondary" type="submit">Go</button>
+      </div>
+    </div>
+  </form><!-- select year form ends -->
+{% endblock %}
+
+{% block page_body %}
+
+<!-- year scheduling table -->
+<div class="row">
+  <div class="col">
+    <table class="table table-bordered table-hover table-sm small">
+      <thead class="thead-dark">
+        <th></th>
+        {% for cohort in cohorts %}
+        <th>{{ cohort }}</th>
+        {% endfor %}
+      </thead>
+      <tbody>
+        {% for day in days %}
+        {% if day in holidays %}
+        <tr class="table-danger text-dark">
+          <td class="text-right pr-3">{{ day|date:"M d" }}</td>
+          <td class="text-center" colspan="{{ cohorts|length }}">{{ holidays|dget:day }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td class="text-right pr-3">{{ day|date:"M d" }}</td>
+          {% for cohort in cohorts %}
+          <td>{{ cohorts|dget:cohort|dget:day }}</td>
+          {% endfor %}
+        </tr>
+        {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

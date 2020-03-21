@@ -27,7 +27,12 @@ register = template.Library()
 ##########################################################################
 
 @register.filter(name='startswith')
-def gravatar(text, prefix):
+def startswith(text, prefix):
     if isinstance(text, str):
         return text.startswith(prefix)
     return False
+
+
+@register.filter(name='dget')
+def dget(d, key):
+    return d.get(key, "")

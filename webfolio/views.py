@@ -19,9 +19,10 @@ Default application views for the application
 
 import webfolio
 
-from datetime import datetime, date
-from cohort.models import Cohort, Course
+from datetime import datetime, date, timedelta
+from cohort.models import Cohort, Course, CalendarEvent
 
+from django.db.models import Q
 from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -63,6 +64,84 @@ class Overview(LoginRequiredMixin, TemplateView):
         context["num_upcoming_courses"] = Course.objects.upcoming().count()
         context["cohort_progress"] = self.get_cohort_progress()
         context["current_cohorts"] = Cohort.objects.order_by("end").ends_after(date.today())[0:3]
+        return context
+
+
+class SchedulingView(LoginRequiredMixin, TemplateView):
+
+    template_name = "site/scheduling.html"
+
+    def get_years(self):
+        """
+        Return the year in the get request or return the current year
+        """
+        # Cache the computation for multiple years requests
+        # https://docs.djangoproject.com/en/3.0/ref/class-based-views/#specification
+        if not hasattr(self, "_year") or not hasattr(self, "_years"):
+            try:
+                self._year = int(self.request.GET.get('year', date.today().year))
+            except ValueError:
+                self._year = date.today().year
+
+            years = frozenset([r[0] for r in Cohort.objects.values_list("start__year")])
+            self._years = sorted(list(years))
+
+        return self._year, self._years
+
+    def get_saturdays(self):
+        """
+        Return all of the Saturdays in the specified year, marked with courses
+        """
+        year = self.get_years()[0]
+        day = date(year, 1, 1)
+
+        # Go to the first Saturday
+        day += timedelta(days = (5 - day.weekday() + 7) % 7)
+
+        # Iterate through all Saturdays in the year
+        while day.year == year:
+            yield day
+            day += timedelta(days=7)
+
+    def get_days(self):
+        """
+        Returns the schedule matrix for the view
+        """
+        days = list(self.get_saturdays())
+        return days
+
+    def get_cohorts(self):
+        """
+        Returns a data structure that maps cohorts to maps of Saturdays to courses.
+        """
+        # TODO: how do we add advanced data science/reboot here?
+        year = self.get_years()[0]
+        table = {}
+        cohorts = Cohort.objects.filter(Q(start__year=year)|Q(end__year=year)).order_by("start")
+        for cohort in cohorts:
+            dates = {}
+            for course in cohort.courses.all():
+                for event in course.calendar_events.all():
+                    dates[event.start.date()] = course.title
+            table[cohort] = dates
+        return table
+
+    def get_holidays(self):
+        """
+        Returns a dictionary of days that are holidays in the calendar and their names.
+        """
+        year = self.get_years()[0]
+        events = CalendarEvent.objects.filter(Q(start__year=year)&Q(is_holiday=True))
+        events = events.order_by("start").values_list("start", "summary")
+        return {s[0].date(): s[1] for s in events}
+
+    def get_context_data(self, **kwargs):
+        context = super(SchedulingView, self).get_context_data(**kwargs)
+        context["page"] = "scheduling"
+        context["year"], context["years"] = self.get_years()
+        context["days"] = self.get_days()
+        context["cohorts"] = self.get_cohorts()
+        context["holidays"] = self.get_holidays()
         return context
 
 
