@@ -54,6 +54,7 @@ router.register(r'status', HeartbeatViewSet, "status")
 
 urlpatterns = [
     # Admin URLs
+    path('grappelli/', include('grappelli.urls')),
     path("admin/", admin.site.urls),
 
      # Authentication URLs

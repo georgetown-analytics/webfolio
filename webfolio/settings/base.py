@@ -101,6 +101,7 @@ WSGI_APPLICATION = 'webfolio.wsgi.application'
 
 # Application definition
 INSTALLED_APPS = [
+    'grappelli',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -250,6 +251,15 @@ REST_FRAMEWORK = {
     'PAGINATE_BY_PARAM': 'per_page',
     'MAX_PAGINATE_BY': 200,
 }
+
+##########################################################################
+## Admin Settings
+##########################################################################
+
+GRAPPELLI_ADMIN_TITLE = "Georgetown Data Science CMS"
+GRAPPELLI_SWITCH_USER = False
+GRAPPELLI_AUTOCOMPLETE_LIMIT = 10
+
 
 ##########################################################################
 ## Logging and Error Reporting
