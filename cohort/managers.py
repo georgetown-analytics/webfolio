@@ -17,8 +17,11 @@ Query managers for cohort models.
 ## Imports
 ##########################################################################
 
-from datetime import date
 from django.db import models
+from django.db.models import Q
+from django.db import connection
+
+from datetime import datetime, date
 
 
 ##########################################################################
@@ -114,10 +117,48 @@ class CohortManager(TimeRangeManager):
 ##########################################################################
 
 class CourseQuerySet(TimeRangeQuerySet):
-    pass
+
+    def semester(self, semester, year):
+        return self.filter(Q(semester=semester) & Q(start__year=year))
+
+    def non_cohort(self):
+        return self.filter(cohort__isnull=True)
 
 
 class CourseManager(TimeRangeManager):
 
     def get_queryset(self):
-        return CohortQuerySet(self.model, using=self._db)
+        return CourseQuerySet(self.model, using=self._db)
+
+    def non_cohort_courses(self, semester, year):
+        return self.filter(
+            Q(semester=semester) & Q(start__year=year) & Q(cohort__isnull=True)
+        )
+
+
+def scheduled_semesters(after=None):
+    """
+    Returns all semesters with courses scheduled on or after the specified datetime.
+
+    Parameters
+    ----------
+    after : datetime, optional
+        Get all semesters scheduled after the specified date, otherwise use today.
+    """
+    query = (
+        "SELECT DISTINCT c.semester, EXTRACT(YEAR FROM c.start) AS year "
+        "FROM courses c WHERE c.end >= %s"
+    )
+
+    if after is None:
+        after = date.today().strftime("%Y-%m-%d")
+    else:
+        if not isinstance(after, (datetime, date)):
+            raise TypeError("after must be a datetime or date")
+        after = after.strftime("%Y-%m-%d")
+
+    with connection.cursor() as cursor:
+        cursor.execute(query, [after])
+        rows = cursor.fetchall()
+
+    return rows

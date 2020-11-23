@@ -119,6 +119,14 @@
             </a>
           </li>
         {% endfor %}
+        {% for semester, courses in scheduled_semesters.items %}
+          <li class="nav-item" >
+            <a class="nav-link"
+              href="#semesterSchedule{{ forloop.counter }}" data-toggle="tab" role="tab">
+              ADS {{ semester }}
+            </a>
+          </li>
+        {% endfor %}
         </ul>
         <div class="tab-content">
         {% for cohort in current_cohorts %}
@@ -165,6 +173,39 @@
                   {% empty %}
                   <tr>
                     <td class="table-danger text-center" colspan="4">No courses have been added to the cohort.</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        {% endfor %}
+        {% for semester, courses in scheduled_semesters.items %}
+          <div class="tab-pane fade" id="semesterSchedule{{ forloop.counter }}" role="tabpanel">
+          <div class="my-4 px-2">
+              <h4 class="small font-weight-bold">Advanced Data Science Certificate Courses and Seminars {{ semester }}</h4>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-bordred table-striped table-sm table-hover" width="100%" cellspacing="0">
+                <thead>
+                  <tr>
+                    <th>Course</th>
+                    <th>Instructor(s)</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for course in courses %}
+                  <tr>
+                    <td>{{ course.title }}</td>
+                    <td>{{ course.instructors.all|join:"<br />" }}</td>
+                    <td>{{ course.start }}</td>
+                    <td>{{ course.end }}</td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                    <td class="table-danger text-center" colspan="4">No courses have been added to the semester.</td>
                   </tr>
                   {% endfor %}
                 </tbody>

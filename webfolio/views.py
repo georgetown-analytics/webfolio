@@ -20,7 +20,8 @@ Default application views for the application
 import webfolio
 
 from datetime import datetime, date, timedelta
-from cohort.models import Cohort, Course, CalendarEvent
+from cohort.managers import scheduled_semesters
+from cohort.models import SEMESTER, Cohort, Course, CalendarEvent
 
 from django.db.models import Q
 from django.shortcuts import render
@@ -56,6 +57,14 @@ class Overview(LoginRequiredMixin, TemplateView):
             "cohort": cohort.cohort,
         }
 
+    def scheduled_semesters(self):
+        for semester, year in scheduled_semesters()[0:2]:
+            courses = Course.objects.non_cohort_courses(semester, year)
+            yield f"{SEMESTER[semester]} {year:0.0f}", courses
+
+    def current_cohorts(self):
+        return Cohort.objects.order_by("end").ends_after(date.today())[0:3]
+
     def get_context_data(self, **kwargs):
         context = super(Overview, self).get_context_data(**kwargs)
         context["page"] = "overview"
@@ -63,7 +72,8 @@ class Overview(LoginRequiredMixin, TemplateView):
         context["num_active_courses"] = Course.objects.current().count()
         context["num_upcoming_courses"] = Course.objects.upcoming().count()
         context["cohort_progress"] = self.get_cohort_progress()
-        context["current_cohorts"] = Cohort.objects.order_by("end").ends_after(date.today())[0:3]
+        context["current_cohorts"] = self.current_cohorts()
+        context["scheduled_semesters"] = dict(self.scheduled_semesters())
         return context
 
 
@@ -96,7 +106,7 @@ class SchedulingView(LoginRequiredMixin, TemplateView):
         day = date(year, 1, 1)
 
         # Go to the first Saturday
-        day += timedelta(days = (5 - day.weekday() + 7) % 7)
+        day += timedelta(days=(5 - day.weekday() + 7) % 7)
 
         # Iterate through all Saturdays in the year
         while day.year == year:
@@ -117,7 +127,9 @@ class SchedulingView(LoginRequiredMixin, TemplateView):
         # TODO: how do we add advanced data science/reboot here?
         year = self.get_years()[0]
         table = {}
-        cohorts = Cohort.objects.filter(Q(start__year=year)|Q(end__year=year)).order_by("start")
+        cohorts = Cohort.objects.filter(
+            Q(start__year=year) | Q(end__year=year)
+        ).order_by("start")
         for cohort in cohorts:
             dates = {}
             for course in cohort.courses.all():
@@ -131,7 +143,9 @@ class SchedulingView(LoginRequiredMixin, TemplateView):
         Returns a dictionary of days that are holidays in the calendar and their names.
         """
         year = self.get_years()[0]
-        events = CalendarEvent.objects.filter(Q(start__year=year)&Q(is_holiday=True))
+        events = CalendarEvent.objects.filter(
+            Q(start__year=year) & Q(is_holiday=True)
+        )
         events = events.order_by("start").values_list("start", "summary")
         return {s[0].date(): s[1] for s in events}
 
