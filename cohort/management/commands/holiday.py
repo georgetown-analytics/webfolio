@@ -67,7 +67,7 @@ class Command(BaseCommand):
                 day -= timedelta(days=3)
             elif day.weekday() < 5:
                 # Move Wednesday, Thursday, Friday to next Saturday
-                day += timedelta(days=(5-day.weekday() + 7) % 7)
+                day += timedelta(days=(5 - day.weekday() + 7) % 7)
             else:
                 # This is a Saturday already
                 pass
@@ -98,4 +98,3 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(
             "created holiday on {}".format(day.strftime(DTFMT))
         ))
-

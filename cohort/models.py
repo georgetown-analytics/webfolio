@@ -53,7 +53,7 @@ class Cohort(TimeStampedModel):
 
     cohort = models.PositiveSmallIntegerField(
         null=False, blank=False, unique=True,
-        help_text="The cohort number, e.g. which cohort from the beginning of the program"
+        help_text="The cohort number, e.g. cohort count from the start of the program"
     )
     semester = models.CharField(
         max_length=2, choices=SEMESTER, null=False, blank=False,
@@ -90,7 +90,7 @@ class Cohort(TimeStampedModel):
         if self.start:
             year = self.start.strftime("%Y")
 
-        sem = "{} {} {}".format(SEMESTER[self.semester].title(), year, self.section or "")
+        sem = "{} {} {}".format(SEMESTER[self.semester], year, self.section or "")
         return sem.strip().replace("  ", " ")
 
     def percent_complete(self):
@@ -103,7 +103,7 @@ class Cohort(TimeStampedModel):
             return 0
         if cdays >= tdays:
             return 100
-        return int((cdays/tdays) * 100)
+        return int((cdays / tdays) * 100)
 
     def __str__(self):
         if self.start:
@@ -122,14 +122,15 @@ class Course(TimeStampedModel):
     group by all instances of the same course, even if the title has changed.
     """
 
-    cohort = models.ForeignKey("Cohort",
+    cohort = models.ForeignKey(
+        "Cohort",
         null=True, blank=True, default=None,
         on_delete=models.CASCADE, related_name="courses",
         help_text="The cohort that this course is a part of (if data science)",
     )
     semester = models.CharField(
         max_length=2, choices=SEMESTER, null=False, blank=True,
-        help_text="The academic semester the course is in (uses cohort semester by default)",
+        help_text="The academic semester the course is in (cohort semester by default)",
     )
     course_id = models.CharField(
         max_length=55, null=False, blank=False, db_index=True, verbose_name="Course ID",
@@ -205,15 +206,21 @@ class Course(TimeStampedModel):
 
             # If it is a 3 hour event, assume 6:30 - 9:30 pm
             if self.hours == 3:
-                start = datetime(self.start.year, self.start.month, self.start.day, 18, 30)
+                start = datetime(
+                    self.start.year, self.start.month, self.start.day, 18, 30
+                )
             # If it is a 6 hour event, assume 9:00 am - 4:00 pm
             elif self.hours == 6:
-                start = datetime(self.start.year, self.start.month, self.start.day, 9, 0)
+                start = datetime(
+                    self.start.year, self.start.month, self.start.day, 9, 0
+                )
             else:
                 raise ValueError("cannot handle {} hours courses".format(self.hours))
 
             # Create the single day event
-            events.append(CalendarEvent(start=start, end=start+timedelta(hours=self.hours)))
+            events.append(CalendarEvent(
+                start=start, end=start + timedelta(hours=self.hours)
+            ))
 
         elif self.hours == 12:
             # Create 9 am - 4 pm events for both the start and end dates
@@ -226,10 +233,12 @@ class Course(TimeStampedModel):
                 ))
         elif self.hours == 18:
             # Create 6:30 - 9:30 pm events for the fridays
-            fridays = (self.start, self.end-timedelta(days=1))
+            fridays = (self.start, self.end - timedelta(days=1))
             for day in fridays:
                 if day.weekday() != 4:
-                    raise ValueError("could not determine Friday evening for 18 hour course")
+                    raise ValueError(
+                        "could not determine Friday evening for 18 hour course"
+                    )
                 events.append(CalendarEvent(
                     start=datetime(day.year, day.month, day.day, 18, 30),
                     end=datetime(day.year, day.month, day.day, 21, 30),
@@ -253,7 +262,7 @@ class Course(TimeStampedModel):
             event.course = self
             event.description = str(self)
 
-            # Ensure start and end time are timezone aware -- all above are in DC timezone
+            # Ensure start and end time are timezone aware -- above are in DC timezone
             ET = pytz.timezone(TIMEZONES[TIMEZONES.Eastern])
             event.start = ET.localize(event.start)
             event.end = ET.localize(event.end)
@@ -267,7 +276,6 @@ class Course(TimeStampedModel):
 
         # Return fully populated calendar events
         return self.calendar_events.all()
-
 
     def __str__(self):
         if self.cohort:
@@ -285,8 +293,10 @@ class Capstone(TimeStampedModel):
     and manage capstones on the site.
     """
 
-    cohort = models.ForeignKey("Cohort",
-        null=False, blank=False, on_delete=models.CASCADE, related_name="capstones",
+    cohort = models.ForeignKey(
+        "Cohort",
+        null=False, blank=False, on_delete=models.CASCADE,
+        related_name="capstones",
         help_text="The cohort the capstone was completed in",
     )
     title = models.CharField(
@@ -413,7 +423,8 @@ class CalendarEvent(TimeStampedModel):
         # Add the start and end to the json data
         for attr in ("start", "end"):
             dt = getattr(self, attr)
-            if not dt: continue
+            if not dt:
+                continue
 
             if is_aware(dt):
                 dt = dt.astimezone(self.get_timezone_object())
@@ -456,7 +467,7 @@ class CalendarEvent(TimeStampedModel):
         if day.weekday() == 5:
             return day.date()
         elif day.weekday() < 5:
-            return day.date() + timedelta(days=(5-day.weekday() + 7) % 7)
+            return day.date() + timedelta(days=(5 - day.weekday() + 7) % 7)
         else:
             return day.date() - timedelta(days=1)
 
