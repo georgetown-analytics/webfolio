@@ -1,0 +1,88 @@
+{% extends "page.html" %}
+
+{% block page_title %}{% now "Y" %} Scheduling{% endblock %}
+{% block page_heading_extra %}{% endblock %}
+
+{% block page_body %}
+
+<!-- Alerts and messages -->
+<div id="alerts" class="row mb-2">
+  <div class="col">
+    {% if form.errors %}
+    {% if form.non_field_errors %}
+    {% for err in form.non_field_errors %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      {{ err }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      Could not parse uploaded assignments.
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% endif %}
+    {% endif %}
+
+    {% include "components/messages.html" %}
+  </div>
+</div>
+
+<!-- Upload events CSV form -->
+<div class="row">
+  <div class="col-12">
+    <div class="card shadow mb-4">
+      <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Upload Schedule</h6>
+      </div>
+      <div class="card-body">
+        <p>
+          Upload a CSV file with faculty assignments from a spreadsheet with the
+          following expected fields:
+        </p>
+        <p class="text-small">
+          <code>Semester, Cohort, Last Name, First Name, Course ID,
+          Course Title, Effort (%), Hours, Start Date, End Date</code>
+        </p>
+        <p>
+          The CSV parser will attempt to create a or fetch a Cohort from the data, then
+          create or update courses and faculty assignments from each row.
+        </p>
+        <hr />
+
+        <form class="mt-4" role="form" method="post"
+          action="{% url 'upload_schedule' %}" enctype="multipart/form-data">
+          <div class="form-group">
+            <div class="custom-file">
+              <input type="file" accept=".csv,.txt,text/plain,text/csv,"
+                class="custom-file-input{% if form.errors.assignments %} is-invalid{% endif %}"
+                id="id_assignments" name="assignments" required>
+              <label class="custom-file-label" for="id_assignments">Choose file</label>
+              <div class="invalid-feedback">{% for err in form.errors.assignments %}{{ err }}{% endfor %}</div>
+            </div>
+          </div>
+          {% csrf_token %}
+          <div class="form-group">
+            <button class="btn btn-primary" type="submit">Submit</button>
+            <button class="btn btn-secondary" type="reset">Reset</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+  {{ block.super }}
+  <script>
+  $(".custom-file-input").on("change", function() {
+    var fileName = $(this).val().split("\\").pop();
+    $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+  });
+  </script>
+{% endblock %}

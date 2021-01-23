@@ -33,11 +33,11 @@ from django.contrib import admin
 from rest_framework import routers
 from django.urls import path, include
 
+from faculty.views import UploadScheduleView, CalendarEventsView
 from faculty.views import UnassociatedFacultyView, ContactsListView
 from webfolio.views import HeartbeatViewSet, Overview, SchedulingView
 from cohort.views import CohortListView, CourseListView, CapstoneListView
 from faculty.views import FacultyListView, AssignmentListView, FacultyDetailView
-
 
 ##########################################################################
 ## Endpoint Discovery
@@ -72,6 +72,8 @@ urlpatterns = [
     path("faculty/assignments/", AssignmentListView.as_view(), name="assignment_list"),
     path("faculty/unassociated/", UnassociatedFacultyView.as_view(), name="faculty_unassociated"),
     path("faculty/<slug:slug>/", FacultyDetailView.as_view(), name="faculty_detail"),
+    path("upload/schedule/", UploadScheduleView.as_view(), name="upload_schedule"),
+    path("calendar/", CalendarEventsView.as_view(), name="calendar_events"),
 
     ## REST API Urls
     path('api/', include((router.urls, 'rest_framework'), namespace="api")),
