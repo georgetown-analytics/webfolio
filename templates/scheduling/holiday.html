@@ -1,0 +1,82 @@
+{% extends "page.html" %}
+
+{% block page_title %}Manage Holidays{% endblock %}
+{% block page_heading_extra %}{% endblock %}
+
+{% block page_body %}
+
+<!-- Alerts and messages -->
+<div id="alerts" class="row mb-2">
+  <div class="col-12 col-lg-10 col-xl-8">
+    {% if form.errors %}
+    {% if form.non_field_errors %}
+    {% for err in form.non_field_errors %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      {{ err }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      Could not add holiday to calendar.
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% endif %}
+    {% endif %}
+
+    {% include "components/messages.html" %}
+  </div>
+</div>
+
+<!-- Upload events CSV form -->
+<div class="row">
+  <div class="col-12 col-lg-10 col-xl-8">
+    <div class="card shadow mb-4">
+      <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Add a Holiday</h6>
+      </div>
+      <div class="card-body">
+        <p>Create an academic holiday event for the closest Saturday (e.g. course day) to the date of the holiday.</p>
+
+        <hr />
+
+        <form class="mt-4" role="form" method="post" action="{% url 'holiday' %}">
+          <div class="form-group">
+            <input type="text" class="form-control{% if form.errors.title %} is-invalid{% endif %}"
+              id="id_title" name="title" placeholder="Holiday Title"
+              aria-describedby="titleHelp" maxlength="255" required
+              />
+            <small id="titleHelp" class="form-text text-muted">The title of the academic holiday</small>
+            <div class="invalid-feedback">{% for err in form.errors.title %}{{ err }}{% endfor %}</div>
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control{% if form.errors.date %} is-invalid{% endif %}"
+              id="id_date" name="date" placeholder="{% now 'Y-m-d' %}"
+              aria-describedby="dateHelp" maxlength="255" required
+              />
+            <small id="dateHelp" class="form-text text-muted">Actual date of the holiday</small>
+            <div class="invalid-feedback">{% for err in form.errors.date %}{{ err }}{% endfor %}</div>
+          </div>
+          <div class="form-group">
+            <div class="custom-control custom-switch">
+              <input type="checkbox" class="custom-control-input{% if form.errors.no_convert %} is-invalid{% endif %}"
+                id="id_no_convert" name="no_convert">
+              <label class="custom-control-label" for="id_no_convert">Don't convert the date to the nearest Saturday</label>
+              <div class="invalid-feedback">{% for err in form.errors.no_convert %}{{ err }}{% endfor %}</div>
+            </div>
+          </div>
+          {% csrf_token %}
+          <div class="form-group">
+            <button class="btn btn-primary" type="submit">Submit</button>
+            <button class="btn btn-secondary" type="reset">Reset</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

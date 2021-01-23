@@ -1,0 +1,84 @@
+{% extends "page.html" %}
+
+{% block page_title %}Manage Calendar{% endblock %}
+{% block page_heading_extra %}{% endblock %}
+
+{% block page_body %}
+
+<!-- Alerts and messages -->
+<div id="alerts" class="row mb-2">
+  <div class="col col-lg-10 col-xl-8">
+    {% if form.errors %}
+    {% if form.non_field_errors %}
+    {% for err in form.non_field_errors %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      {{ err }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      Could not synchronize course calendar.
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% endif %}
+    {% endif %}
+
+    {% include "components/messages.html" %}
+  </div>
+</div>
+
+<!-- Upload events CSV form -->
+<div class="row">
+  <div class="col-12 col-lg-10 col-xl-8">
+    <div class="card shadow mb-4">
+      <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Synchronize Calendar</h6>
+      </div>
+      <div class="card-body">
+        <p>Create calendar events for courses in the specified time range, deleting existing events if necessary.</p>
+
+        <hr />
+
+        <form class="mt-4" role="form" method="post" action="{% url 'calendar_events' %}">
+          <div class="row form-group">
+            <div class="col-md-6">
+              <input type="text" class="form-control{% if form.errors.after %} is-invalid{% endif %}"
+                id="id_after" name="after" placeholder="{% now 'Y-m-d' %}"
+                aria-describedby="afterHelp" maxlength="255"
+                />
+              <small id="afterHelp" class="form-text text-muted">Only courses after this date (optional)</small>
+              <div class="invalid-feedback">{% for err in form.errors.after %}{{ err }}{% endfor %}</div>
+            </div>
+            <div class="col-md-6">
+              <input type="text" class="form-control{% if form.errors.before %} is-invalid{% endif %}"
+                id="id_before" name="before" placeholder="{% now 'Y-m-d' %}"
+                aria-describedby="beforeHelp" maxlength="255"
+                />
+              <small id="beforeHelp" class="form-text text-muted">Only courses before this date (optional)</small>
+              <div class="invalid-feedback">{% for err in form.errors.before %}{{ err }}{% endfor %}</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="custom-control custom-switch">
+              <input type="checkbox" class="custom-control-input{% if form.errors.delete_events %} is-invalid{% endif %}"
+                id="id_delete_events" name="delete_events">
+              <label class="custom-control-label" for="id_delete_events">Delete any existing events first</label>
+              <div class="invalid-feedback">{% for err in form.errors.delete_events %}{{ err }}{% endfor %}</div>
+            </div>
+          </div>
+          {% csrf_token %}
+          <div class="form-group">
+            <button class="btn btn-primary" type="submit">Submit</button>
+            <button class="btn btn-secondary" type="reset">Reset</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

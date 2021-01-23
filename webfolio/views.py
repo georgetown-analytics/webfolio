@@ -58,7 +58,7 @@ class Overview(LoginRequiredMixin, TemplateView):
         }
 
     def scheduled_semesters(self):
-        for semester, year in scheduled_semesters()[0:2]:
+        for semester, year in scheduled_semesters():
             courses = Course.objects.non_cohort_courses(semester, year)
             yield f"{SEMESTER[semester]} {year:0.0f}", courses
 
@@ -73,7 +73,7 @@ class Overview(LoginRequiredMixin, TemplateView):
         context["num_upcoming_courses"] = Course.objects.upcoming().count()
         context["cohort_progress"] = self.get_cohort_progress()
         context["current_cohorts"] = self.current_cohorts()
-        context["scheduled_semesters"] = dict(self.scheduled_semesters())
+        context["scheduled_semesters"] = list(self.scheduled_semesters())
         return context
 
 

@@ -33,7 +33,8 @@ from django.contrib import admin
 from rest_framework import routers
 from django.urls import path, include
 
-from faculty.views import UploadScheduleView, CalendarEventsView
+from faculty.views import UploadScheduleView
+from cohort.views import CalendarEventsView, HolidayView
 from faculty.views import UnassociatedFacultyView, ContactsListView
 from webfolio.views import HeartbeatViewSet, Overview, SchedulingView
 from cohort.views import CohortListView, CourseListView, CapstoneListView
@@ -63,7 +64,6 @@ urlpatterns = [
 
     # Application URLs
     path("", Overview.as_view(), name="overview"),
-    path("scheduling/", SchedulingView.as_view(), name="scheduling"),
     path("cohorts/", CohortListView.as_view(), name="cohort_list"),
     path("courses/", CourseListView.as_view(), name="course_list"),
     path("capstones/", CapstoneListView.as_view(), name="capstone_list"),
@@ -72,8 +72,10 @@ urlpatterns = [
     path("faculty/assignments/", AssignmentListView.as_view(), name="assignment_list"),
     path("faculty/unassociated/", UnassociatedFacultyView.as_view(), name="faculty_unassociated"),
     path("faculty/<slug:slug>/", FacultyDetailView.as_view(), name="faculty_detail"),
-    path("upload/schedule/", UploadScheduleView.as_view(), name="upload_schedule"),
-    path("calendar/", CalendarEventsView.as_view(), name="calendar_events"),
+    path("scheduling/", SchedulingView.as_view(), name="scheduling"),
+    path("scheduling/upload/", UploadScheduleView.as_view(), name="upload_schedule"),
+    path("scheduling/calendar", CalendarEventsView.as_view(), name="calendar_events"),
+    path("scheduling/holiday", HolidayView.as_view(), name="holiday"),
 
     ## REST API Urls
     path('api/', include((router.urls, 'rest_framework'), namespace="api")),

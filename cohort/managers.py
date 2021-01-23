@@ -146,8 +146,10 @@ def scheduled_semesters(after=None):
         Get all semesters scheduled after the specified date, otherwise use today.
     """
     query = (
+        "WITH sorted_courses AS ( "
+        "SELECT c.semester, c.start FROM courses c WHERE c.end >= %s ORDER BY c.start) "
         "SELECT DISTINCT c.semester, EXTRACT(YEAR FROM c.start) AS year "
-        "FROM courses c WHERE c.end >= %s"
+        "FROM sorted_courses c"
     )
 
     if after is None:

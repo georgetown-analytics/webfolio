@@ -92,9 +92,3 @@ class UploadScheduleForm(forms.Form):
             f"(fetched {sum(fetched.values())} objects, {n_errors} errors)"
         )
         messages.add_message(request, messages.SUCCESS, msg)
-
-
-class CalendarEventsForm(forms.Form):
-    """
-    Allows admins to update calendar events
-    """

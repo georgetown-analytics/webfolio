@@ -17,10 +17,12 @@ Cohort app views.
 ## Imports
 ##########################################################################
 
-from django.views.generic import ListView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse
+from django.views.generic import ListView, FormView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 from cohort.models import Cohort, Course, Capstone
+from cohort.forms import CalendarEventsForm, HolidayForm
 
 
 class CohortListView(ListView, LoginRequiredMixin):
@@ -57,4 +59,50 @@ class CapstoneListView(ListView, LoginRequiredMixin):
     def get_context_data(self, **kwargs):
         context = super(CapstoneListView, self).get_context_data(**kwargs)
         context["page"] = "cohort/capstones"
+        return context
+
+
+##########################################################################
+## Administrative Views
+##########################################################################
+
+class CalendarEventsView(UserPassesTestMixin, FormView):
+
+    form_class = CalendarEventsForm
+    template_name = "scheduling/calendar_events.html"
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+    def get_success_url(self):
+        return reverse("calendar_events")
+
+    def form_valid(self, form):
+        form.save(self.request)
+        return super(CalendarEventsView, self).form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super(CalendarEventsView, self).get_context_data(**kwargs)
+        context["page"] = "admin/calendar-events"
+        return context
+
+
+class HolidayView(UserPassesTestMixin, FormView):
+
+    form_class = HolidayForm
+    template_name = "scheduling/holiday.html"
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+    def get_success_url(self):
+        return reverse("holiday")
+
+    def form_valid(self, form):
+        form.save(self.request)
+        return super(HolidayView, self).form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super(HolidayView, self).get_context_data(**kwargs)
+        context["page"] = "admin/holiday"
         return context
