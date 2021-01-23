@@ -34,11 +34,27 @@ def read_assignments(path):
         Effort (%),Hours,Start Date,End Date
     """
     with open(path, 'r') as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            yield {
-                key: value.strip() for key, value in row.items()
-            }
+        return _read_assignments(f)
+
+
+def decode_assignments(f):
+    """
+    Read a utf-8 encoded uploaded file
+    """
+    return _read_assignments(decode_utf8(f))
+
+
+def decode_utf8(f):
+    for line in f:
+        yield line.decode('utf-8')
+
+
+def _read_assignments(f):
+    reader = csv.DictReader(f)
+    for row in reader:
+        yield {
+            key: value.strip() for key, value in row.items()
+        }
 
 
 def parse_assignments(cohort_rows):

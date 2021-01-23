@@ -17,11 +17,14 @@ Faculty app views.
 ## Imports
 ##########################################################################
 
+from django.urls import reverse
 from django.db import connection
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import FormView
 from django.views.generic import ListView, DetailView, TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 from faculty.models import Faculty, Assignment, Contact
+from faculty.forms import UploadScheduleForm, CalendarEventsForm
 
 
 class FacultyListView(ListView, LoginRequiredMixin):
@@ -105,4 +108,53 @@ class ContactsListView(ListView, LoginRequiredMixin):
         context["mailto_all_faculty"] = ", ".join([
             row["full_email"] for row in context["faculty"] if row["email"]]
         )
+        return context
+
+
+##########################################################################
+## Administrative Views
+##########################################################################
+
+class UploadScheduleView(UserPassesTestMixin, FormView):
+
+    form_class = UploadScheduleForm
+    template_name = "faculty/upload_schedule.html"
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+    def get_success_url(self):
+        return reverse("upload_schedule")
+
+    def form_valid(self, form):
+        """
+        Parse the uploaded file and create assignments as necessary.
+        """
+        form.save(self.request)
+        return super(UploadScheduleView, self).form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super(UploadScheduleView, self).get_context_data(**kwargs)
+        context["page"] = "admin/upload-schedule"
+        return context
+
+
+class CalendarEventsView(UserPassesTestMixin, FormView):
+
+    form_class = CalendarEventsForm
+    template_name = "faculty/calendar_events.html"
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+    def get_success_url(self):
+        return reverse("scheduling")
+
+    def form_valid(self, form):
+        messages.add_message(self.request, messages.INFO, "Hello World!")
+        return super(CalendarEventsView, self).form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super(CalendarEventsView, self).get_context_data(**kwargs)
+        context["page"] = "admin/calendar-events"
         return context
