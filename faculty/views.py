@@ -23,8 +23,8 @@ from django.views.generic import FormView
 from django.views.generic import ListView, DetailView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
+from faculty.forms import UploadScheduleForm
 from faculty.models import Faculty, Assignment, Contact
-from faculty.forms import UploadScheduleForm, CalendarEventsForm
 
 
 class FacultyListView(ListView, LoginRequiredMixin):
@@ -118,7 +118,7 @@ class ContactsListView(ListView, LoginRequiredMixin):
 class UploadScheduleView(UserPassesTestMixin, FormView):
 
     form_class = UploadScheduleForm
-    template_name = "faculty/upload_schedule.html"
+    template_name = "scheduling/upload_schedule.html"
 
     def test_func(self):
         return self.request.user.is_staff
@@ -136,25 +136,4 @@ class UploadScheduleView(UserPassesTestMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super(UploadScheduleView, self).get_context_data(**kwargs)
         context["page"] = "admin/upload-schedule"
-        return context
-
-
-class CalendarEventsView(UserPassesTestMixin, FormView):
-
-    form_class = CalendarEventsForm
-    template_name = "faculty/calendar_events.html"
-
-    def test_func(self):
-        return self.request.user.is_staff
-
-    def get_success_url(self):
-        return reverse("scheduling")
-
-    def form_valid(self, form):
-        messages.add_message(self.request, messages.INFO, "Hello World!")
-        return super(CalendarEventsView, self).form_valid(form)
-
-    def get_context_data(self, **kwargs):
-        context = super(CalendarEventsView, self).get_context_data(**kwargs)
-        context["page"] = "admin/calendar-events"
         return context

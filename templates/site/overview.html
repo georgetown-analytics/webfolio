@@ -119,11 +119,11 @@
             </a>
           </li>
         {% endfor %}
-        {% for semester, courses in scheduled_semesters.items %}
+        {% for item in scheduled_semesters %}
           <li class="nav-item" >
             <a class="nav-link"
               href="#semesterSchedule{{ forloop.counter }}" data-toggle="tab" role="tab">
-              ADS {{ semester }}
+              ADS {{ item.0 }}
             </a>
           </li>
         {% endfor %}
@@ -180,7 +180,8 @@
             </div>
           </div>
         {% endfor %}
-        {% for semester, courses in scheduled_semesters.items %}
+        {% for item in scheduled_semesters %}
+          {% with semester=item.0 courses=item.1 %}
           <div class="tab-pane fade" id="semesterSchedule{{ forloop.counter }}" role="tabpanel">
           <div class="my-4 px-2">
               <h4 class="small font-weight-bold">Advanced Data Science Certificate Courses and Seminars {{ semester }}</h4>
@@ -212,6 +213,7 @@
               </table>
             </div>
           </div>
+          {% endwith %}
         {% endfor %}
         </div>
         {% else %}
