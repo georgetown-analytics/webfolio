@@ -18,7 +18,25 @@ Cohort app admin site.
 ##########################################################################
 
 from django.contrib import admin
-from .models import Cohort, Course, Capstone, CalendarEvent
+from faculty.models import Assignment
+from cohort.models import Cohort, Course, Capstone, CalendarEvent
+
+
+##########################################################################
+## Admin Forms
+##########################################################################
+
+class AssignmentsInline(admin.StackedInline):
+
+    model = Assignment
+    extra = 1
+
+
+class CourseAdmin(admin.ModelAdmin):
+
+    inlines = [
+        AssignmentsInline
+    ]
 
 
 ##########################################################################
@@ -26,6 +44,6 @@ from .models import Cohort, Course, Capstone, CalendarEvent
 ##########################################################################
 
 admin.site.register(Cohort)
-admin.site.register(Course)
 admin.site.register(Capstone)
 admin.site.register(CalendarEvent)
+admin.site.register(Course, CourseAdmin)

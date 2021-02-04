@@ -123,7 +123,6 @@ class Faculty(TimeStampedModel):
         help_text="Exclude from active faculty participation (archive only)",
     )
 
-
     class Meta:
         db_table = "faculty"
         ordering = ("last_name", "first_name")
@@ -200,7 +199,7 @@ class Assignment(TimeStampedModel):
         help_text="Faculty member who is instructing a course or advising the cohort",
     )
     cohort = models.ForeignKey(
-        "cohort.Cohort", on_delete=models.CASCADE, null=False, blank=True,
+        "cohort.Cohort", on_delete=models.CASCADE, null=True, blank=True,
         related_name="instructional_assignments",
         help_text="Must specify if a course is not set, otherwise will default to course cohort",
     )
