@@ -238,6 +238,15 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
 GOOGLE_OAUTH2_SOCIAL_AUTH_RAISE_EXCEPTIONS = True
 SOCIAL_AUTH_RAISE_EXCEPTIONS = True
 
+
+##########################################################################
+## Google Calendar
+##########################################################################
+
+CALENDAR_GOOGLE_OAUTH2_KEY = environ_setting('GOOGLE_OAUTH2_CLIENT_ID', "")
+CALENDAR_GOOGLE_OAUTH2_SECRET = environ_setting('GOOGLE_OAUTH2_CLIENT_SECRET', "")
+
+
 ##########################################################################
 ## Django REST Framework
 ##########################################################################

@@ -376,6 +376,7 @@ class CalendarEvent(TimeStampedModel):
     class Meta:
         db_table = "calendar"
         ordering = ("start",)
+        get_latest_by = "start"
         verbose_name = "Calendar Event"
         verbose_name_plural = "Calendar Events"
 
@@ -414,8 +415,8 @@ class CalendarEvent(TimeStampedModel):
             "reminders": {
                 "useDefault": False,
                 "overrides": [
-                    {"method": "email", "days": 5},
-                    {"method": "popup", "days": 1},
+                    {"method": "email", "days": 5, "minutes": 0},
+                    {"method": "popup", "days": 1, "minutes": 0},
                 ],
             },
         }
@@ -444,7 +445,7 @@ class CalendarEvent(TimeStampedModel):
             email = attendee.get_email()
             if email:
                 data["attendees"].append({
-                    {"email": email}
+                    "email": email
                 })
 
         return data
