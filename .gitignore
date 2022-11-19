@@ -131,3 +131,5 @@ dmypy.json
 fixtures/*.csv
 theme/
 tmp/
+
+.vscode
