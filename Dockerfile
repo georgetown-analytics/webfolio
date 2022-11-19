@@ -58,4 +58,7 @@ RUN chown -R app:app ${APP_HOME}
 USER app
 EXPOSE 8000
 
+RUN mkdir staticfiles
+RUN python3 manage.py collectstatic
+
 CMD [ "gunicorn", "--bind", "0.0.0.0:8000", "webfolio.wsgi", "--log-file", "-" ]

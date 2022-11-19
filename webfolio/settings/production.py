@@ -32,7 +32,6 @@ DEBUG = False
 ## Hosts
 ALLOWED_HOSTS = [
     'georgetowndata.science',
-    'gdsc-webfolio.herokuapp.com',
 ]
 
 ## Use SSL
