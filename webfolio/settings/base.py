@@ -26,6 +26,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 ##########################################################################
 
 import os
+import warnings
 import dj_database_url
 
 
@@ -44,10 +45,10 @@ def environ_setting(name, default=None):
     raise an ImproperlyConfigured exception.
     """
     if name not in os.environ and default is None:
-        from django.core.exceptions import ImproperlyConfigured
-        raise ImproperlyConfigured(
-            "The {0} ENVVAR is not set.".format(name)
+        warnings.warn(
+            "{} ENVVAR is not set.".format(name), UserWarning
         )
+        return None
 
     return os.environ.get(name, default)
 
