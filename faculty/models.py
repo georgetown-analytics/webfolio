@@ -21,13 +21,10 @@ from hashlib import md5
 from django.db import models
 from django.urls import reverse
 from model_utils import Choices
-from collections import Counter
 from django.conf import settings
 from model_utils.models import TimeStampedModel
-from django.contrib.contenttypes.models import ContentType
 from faculty.managers import AssignmentManager, ContactManager
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 
 
 FACULTY_ROLES = Choices(
@@ -159,7 +156,9 @@ class Faculty(TimeStampedModel):
         # TODO: this hack is going to lead to poor performance
         roles = self.assignments.values('role').annotate(count=models.Count("role"))
         roles = roles.order_by("-count")[0:1]
-        return FACULTY_ROLES[roles[0]["role"]]
+        if roles:
+            return FACULTY_ROLES[roles[0]["role"]]
+        return "No Assignments"
 
     def gravatar(self, size=512):
         email = self.get_email() or ""
@@ -239,7 +238,7 @@ class Assignment(TimeStampedModel):
 
     class Meta:
         db_table = "assignments"
-        ordering = ("-start", "-cohort__cohort")
+        ordering = ("-cohort__cohort", "start")
         unique_together = ("faculty", "cohort", "course", "role")
 
     @property

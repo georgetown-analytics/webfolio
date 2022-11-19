@@ -75,6 +75,7 @@ DATABASES = {
 
 DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql_psycopg2'
 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 ##########################################################################
 ## Secrets
@@ -131,7 +132,6 @@ MIDDLEWARE = [
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'America/New_York'
 USE_I18N = True
-USE_L10N = True
 USE_TZ = True
 
 
@@ -209,7 +209,7 @@ AUTHENTICATION_BACKENDS = (
 ##########################################################################
 
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
-SOCIAL_AUTH_POSTGRES_JSONFIELD = True
+SOCIAL_AUTH_JSONFIELD_ENABLED = True
 
 SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_details',

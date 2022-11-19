@@ -8,7 +8,7 @@
     <div class="input-group">
       <select class="custom-select" name="year" id="year">
         {% for y in years %}
-        <option value="{{ y }}" {% ifequal y year %} selected{% endifequal %}>{{ y }}</option>
+        <option value="{{ y }}" {% if y == year %} selected{% endif %}>{{ y }}</option>
         {% endfor %}
       </select>
       <div class="input-group-append">
