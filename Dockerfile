@@ -38,6 +38,7 @@ RUN addgroup --system app && adduser --system --group app
 # Set working directory and execution environment
 ENV HOME=/home/app
 ENV APP_HOME=/home/app/web
+ENV DJANGO_SETTINGS_MODULE=webfolio.settings.production
 
 RUN mkdir ${APP_HOME}
 WORKDIR ${APP_HOME}
