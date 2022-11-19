@@ -58,7 +58,7 @@ urlpatterns = [
     path('grappelli/', include('grappelli.urls')),
     path("admin/", admin.site.urls),
 
-     # Authentication URLs
+    # Authentication URLs
     path("", include("django.contrib.auth.urls")),
     path("", include(("social_django.urls", "social_django"), namespace="social")),
 

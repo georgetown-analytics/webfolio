@@ -17,6 +17,6 @@ The base directory for project related files and the uwsgi controller.
 ## Imports
 ##########################################################################
 
-from .version import get_version, get_revision,  __version_info__
+from .version import get_version, get_revision, __version_info__
 
 __version__ = get_version()

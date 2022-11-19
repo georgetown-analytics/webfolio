@@ -46,7 +46,7 @@ def main():
             "forget to activate a virtual environment?"
         ) from exc
 
-     # execute the django admin script
+    # execute the django admin script
     execute_from_command_line(sys.argv)
 
 

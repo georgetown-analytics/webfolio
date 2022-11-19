@@ -94,7 +94,7 @@ def parse_assignments(cohort_rows):
                 try:
                     faculty, created = parse_faculty(row)
                     yield faculty, created
-                except ValueError as e:
+                except ValueError:
                     yield ValueError(
                         "no faculty member for {} ({}): could not create assignment".format(
                             row["Course Title"], row["Semester"],
@@ -245,6 +245,7 @@ def find_course_date(rows, course_prefix, field="Start Date", allow_null=True):
 SEMRE = re.compile(
     r'^(?P<full_semester>(?P<semester>Spring|Summer|Fall) (?P<year>\d{4}))\s*(?P<section>[ABC]?)$', re.I
 )
+
 
 def parse_cohort_semester(rows):
     match = SEMRE.match(rows[0]["Semester"])
