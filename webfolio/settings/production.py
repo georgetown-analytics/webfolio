@@ -34,8 +34,8 @@ ALLOWED_HOSTS = [
     'georgetowndata.science',
 ]
 
-## Use SSL
-SECURE_SSL_REDIRECT = True
+## SSL is terminated at Traefik so all requests will be http in the k8s cluster.
+SECURE_SSL_REDIRECT = False
 
 ## Static files served by WhiteNoise
 STATIC_ROOT = os.path.join(PROJECT, 'staticfiles')
