@@ -28,6 +28,10 @@ from .base import PROJECT
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8000', 'http://127.0.0.1:8000',
+]
+
 MEDIA_ROOT = os.path.join(PROJECT, 'tmp', 'media')
 
 ## Static files served by WhiteNoise nostatic server

@@ -34,6 +34,10 @@ ALLOWED_HOSTS = [
     'georgetowndata.science',
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://georgetowndata.science',
+]
+
 ## SSL is terminated at Traefik so all requests will be http in the k8s cluster.
 SECURE_SSL_REDIRECT = False
 
